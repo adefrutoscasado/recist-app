@@ -1,0 +1,32 @@
+---
+engines:
+  csslint:
+    enabled: true
+  duplication:
+    enabled: true
+    config:
+      languages:
+      - javascript
+  eslint:
+    enabled: true
+    config:
+      config: .eslintrc.js
+  fixme:
+    enabled: true
+ratings:
+  paths:
+  - "**.css"
+  - "**.js"
+exclude_paths:
+- assets/**/*
+- build/*
+- data/**/*
+- dist/**/*
+- examples/**/*
+- lessons/**/*
+- external/**/*
+- deprecated/**/*
+- legacy/**/*
+- specs/**/*
+- src/controls/**/*
+- karma.conf.js
