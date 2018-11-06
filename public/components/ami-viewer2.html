@@ -1,0 +1,413 @@
+<link rel="import" href="/bower_components/polymer/polymer.html">
+<link rel="import" href="/bower_components/polymer/polymer-element.html">
+<link rel="import" href="/bower_components/ami-import/ami-import.html">
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js"></script>
+<script src="http://code.jquery.com/ui/1.9.2/jquery-ui.js"></script>
+
+<!--
+AMI Viewer element!
+`ami-viewer` takes an array of data organized by series/stacks/frames (provided by the [ami-loader](http://fnndsc.github.io/ami-loader) and displays it.
+@demo demo/index.html
+-->
+
+<dom-module id="ami-viewer2">
+  <template>
+    <style>
+      :host {
+        display: block;
+        position: relative;
+      }
+
+      #container {
+        position: absolute;
+        top: 0;
+        bottom: 0;
+        left: 0;
+        right: 0;
+      }
+    </style>
+
+    <div id="container"></div>
+
+  </template>
+
+  <script>
+
+    class AmiViewer2 extends Polymer.Element {
+
+      static get is() { return 'ami-viewer2'; }
+
+      static get properties() {
+        return {
+
+          series: {
+            type: Array,
+            value: [],
+            observer: '_seriesChanged'
+          },
+
+          stack: {
+            type: Object,
+            value: null,
+            notify: true
+          },
+
+          stackhelper: {
+            type: Object,
+            value: null,
+            notify: true
+          },
+
+          renderer: {
+            type: Object,
+            value: null,
+            notify: true
+          },
+
+          scene: {
+            type: Object,
+            value: null,
+            notify: true
+          },
+
+          camera: {
+            type: Object,
+            value: null,
+            notify: true
+          },
+
+          controls: {
+            type: Object,
+            value: null,
+            notify: true
+          },
+
+          init: {
+            type: Boolean,
+            value: false
+          },
+
+          animationFrameID: {
+            type: Number,
+            value: -1
+          },
+
+          orientation: {
+            type: String,
+            value: 'default',
+            observer: '_orientationChanged'
+          },
+
+          index: {
+            type: Number,
+            value: 0,
+            notify: true,
+            observer: '_indexChanged'
+          },
+
+          indexMax: {
+            type: Number,
+            value: 0,
+            notify: true
+          },
+
+          flipRows: {
+            type: Boolean,
+            value: false,
+            observer: '_flipRowsChanged'
+          },
+
+          flipColumns: {
+            type: Boolean,
+            value: false,
+            observer: '_flipColumnsChanged'
+          },
+
+          borderColor: {
+            type: String,
+            value: '#FF9800',
+            observer: '_borderColorChanged'
+          },
+
+          angle: {
+            type: Number,
+            value: 0,
+            notify: true,
+            observer: '_angleChanged'
+          },
+
+          threed: {
+            type: Object,
+            value: null,
+            notify: true
+          }
+
+        };
+      }
+
+
+      _seriesChanged() {
+        console.log('AMI-viewer _seriesChanged');
+
+        if (!this.series || this.series.length <= 0) {
+          console.log('AMI-viewer _seriesChanged: not valid series');
+          return;
+        }
+
+        if (!this.init) {
+          this._init();
+        }
+
+        // remove previous stack from the scene
+        this.scene.remove(this.stackhelper);
+
+        // create helper!
+        this.stack = this.series[0].stack[0];
+
+        this.set('stack', this.stack);
+
+        this.stackhelper = new AMI.default.Helpers.Stack(this.stack);
+
+        // tune bounding box
+        this.stackhelper.bbox.visible = false;
+
+        // tune slice border
+        this.stackhelper.border.color = this.borderColor;
+
+        this.scene.add(this.stackhelper);
+
+        this._setupCamera();
+        this.stackhelper.orientation = this.camera.stackOrientation;
+        this._setupIndex();
+
+        // add mouse wheel event listener
+        var myitem = this.$.container;
+
+        myitem.addEventListener('mousewheel', e => this.MouseWheelHandler(e));
+
+        // if (myitem.addEventListener)
+        // {
+        //     // IE9, Chrome, Safari, Opera
+        //     //myitem.addEventListener("mousewheel", MouseWheelHandler, false);
+        //     myitem.addEventListener('mousewheel', e => MouseWheelHandler(e));
+        //     // Firefox
+        //     myitem.addEventListener("DOMMouseScroll", MouseWheelHandler, false);
+        // }
+        // // IE 6/7/8
+        // else
+        // {
+        //     myitem.attachEvent("onmousewheel", MouseWheelHandler);
+        // }
+
+        // flips
+        if (this.flipRows) {
+          this.camera.invertRows();
+        }
+
+        if (this.flipColumns) {
+          this.camera.invertColumns();
+        }
+      }
+
+      MouseWheelHandler(e) {
+        // cross-browser wheel delta
+        e = window.event || e; // old IE support
+        var delta = Math.max(-1, Math.min(1, (e.wheelDelta || -e.detail)));
+
+        var newindex = this.stackhelper.index + delta;
+
+        if (newindex < 0) { // apply that min value = 1
+          this.index = 0;
+        } else if (newindex > this.stackhelper._stack._numberOfFrames - 1) { // apply that max value = numberofframes
+          this.index = this.stackhelper._stack._numberOfFrames - 1;
+        } else {
+          this.ClearDOMWidgets();
+          this.index = newindex;
+        }
+      }
+
+      _init() {
+        console.log('AMI-VIEWER2 init');
+
+        // init the renderer
+        this.renderer = new THREE.WebGLRenderer({
+          antialias: true
+        });
+        this.renderer.setSize(this.$.container.offsetWidth, this.$.container.offsetHeight);
+        this.renderer.setClearColor(0x353535, 1);
+        this.renderer.setPixelRatio(window.devicePixelRatio);
+        this.$.container.appendChild(this.renderer.domElement);
+
+        // init the scene
+        this.scene = new THREE.Scene();
+
+        // init the camera
+        this.camera = new AMI.default.Cameras.Orthographic(this.$.container.clientWidth / -2, this.$.container.clientWidth / 2, this.$.container.clientHeight / 2, this.$.container.clientHeight / -2, 0.1, 10000);
+
+
+        this.set('threed', this.$.container);
+
+        // init the controls
+        this.controls = new AMI.default.Controls.TrackballOrtho(this.camera, this.$.container);
+        this.controls.staticMoving = true;
+        this.controls.noRotate = true;
+        this.camera.controls = this.controls;
+
+        // event listeners
+        this._onWindowResize = this._onWindowResize.bind(this);
+        window.addEventListener('resize', this._onWindowResize, false);
+
+        this.index = 0;
+
+        this.init = true;
+
+        this.threed = this.$.container;
+
+        console.log('AMI-VIEWER2 init Finished');
+
+        this.animate();
+      }
+
+      animate() {
+        this.animationFrameID = window.requestAnimationFrame(this.animate.bind(this));
+
+        this.controls.update();
+        this.renderer.render(this.scene, this.camera);
+      }
+
+      _onWindowResize() {
+        this.camera.canvas = {
+          width: this.$.container.clientWidth,
+          height: this.$.container.clientHeight
+        };
+
+        this.camera.fitBox(2);
+
+        this.renderer.setSize(this.$.container.clientWidth, this.$.container.clientHeight);
+      }
+
+      _orientationChanged() {
+        if (!(this.orientation === 'free' ||
+          this.orientation === 'default' ||
+          this.orientation === 'axial' ||
+          this.orientation === 'coronal' ||
+          this.orientation === 'sagittal')) {
+          window.console.warn('invalid orientation: ' + this.orientation);
+          window.console.warn('setting orientation to "default"');
+          this.orientation = 'default';
+        }
+
+        if (!this.stackhelper) {
+          return;
+        }
+
+        this._setupCamera();
+
+        this.stackhelper.orientation = this.camera.stackOrientation;
+        this._setupIndex();
+      }
+
+      _setupIndex() {
+        var max = 0;
+        var dimensionsIJK = this.stack.dimensionsIJK;
+
+        switch (this.stackhelper.orientation) {
+          case 0:
+            max = dimensionsIJK.z - 1;
+            break;
+          case 1:
+            max = dimensionsIJK.x - 1;
+            break;
+          case 2:
+            max = dimensionsIJK.y - 1;
+            break;
+          default:
+            // do nothing!
+            break;
+        }
+
+        this.indexMax = max;
+        this.stackhelper.index = this.index;
+      }
+
+      _setupCamera() {
+        var worldbb = this.stack.worldBoundingBox();
+        var lpsDims = new THREE.Vector3(
+          worldbb[1] - worldbb[0],
+          worldbb[3] - worldbb[2],
+          worldbb[5] - worldbb[4]
+        );
+
+        // box: {halfDimensions, center}
+        var box = {
+          center: this.stack.worldCenter().clone(),
+          halfDimensions: new THREE.Vector3(lpsDims.x + 10, lpsDims.y + 10, lpsDims.z + 10)
+        };
+
+        // init and zoom
+        var canvas = {
+          width: this.$.container.clientWidth,
+          height: this.$.container.clientHeight
+        };
+
+        this.camera.directions = [this.stack.xCosine, this.stack.yCosine, this.stack.zCosine];
+        this.camera.orientation = this.orientation;
+        this.camera.box = box;
+        this.camera.canvas = canvas;
+        this.camera.update();
+        this.camera.angle = this.angle;
+        this.camera.fitBox(2);
+      }
+
+      _indexChanged() {
+        if (!this.stackhelper) {
+          return;
+        }
+        this.stackhelper.index = this.index;
+        console.log('indexChanged finished');
+      }
+
+      _flipRowsChanged() {
+        if (!this.camera) {
+          return;
+        }
+        this.camera.invertRows();
+        this.angle = this.camera.angle;
+      }
+
+      _flipColumnsChanged() {
+        if (!this.camera) {
+          return;
+        }
+        this.camera.invertColumns();
+        this.angle = this.camera.angle;
+      }
+
+      _angleChanged() {
+        if (!this.camera) {
+          return;
+        }
+        this.camera.angle = this.angle;
+      }
+
+      _borderColorChanged() {
+        if (!this.stackhelper) {
+          return;
+        }
+        window.console.log(this.borderColor);
+        this.stackhelper.border.color = this.borderColor;
+      }
+
+      ClearDOMWidgets() {
+        var widgetDiv = Polymer.dom(this.root).querySelectorAll('.widgets');
+        $(widgetDiv).remove();
+        var widgetDiv = Polymer.dom(this.root).querySelectorAll('.Widget');
+        $(widgetDiv).remove();
+      }
+    }
+
+    customElements.define(AmiViewer2.is, AmiViewer2);
+
+  </script>
+</dom-module>

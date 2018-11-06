@@ -1,0 +1,1120 @@
+<html>
+<script src='bower_components/webcomponentsjs/webcomponents-lite.js'></script>
+<link rel='import' href='components/ami-loader2.html'>
+<link rel='import' href='components/ami-viewer2.html'>
+<link rel='import' href='components/ami-widget2.html'>
+<link rel='import' href='/bower_components/ami-import/ami-import.html'>
+<link rel='import' href='/bower_components/paper-button/paper-button.html'>
+<script type='text/javascript' src='http://ajax.googleapis.com/ajax/libs/jquery/1.4.1/jquery.min.js'></script>
+<link href='https://fonts.googleapis.com/icon?family=Material+Icons' rel='stylesheet'>
+<link href='http://fonts.googleapis.com/css?family=Roboto' rel='stylesheet' type='text/css'>
+
+<dom-module id='ami-app'>
+
+  <body>
+    <template>
+
+      <style is='custom-style'>
+        ami-viewer2 {
+                    height: 100%;
+                    width: 100%;
+                    border: 1px solid #aaaaaa;
+                }
+                
+                .dropzone {
+                    text-align: center;
+                    height: 450px;
+                    width: 400px;
+                    padding: 10px;
+                    outline: 1px dashed #aaaaaa;
+                    outline-offset: -25px;
+                }
+                
+                paper-button:hover {
+                    background-color: #E0E0E0 !important;
+                }
+                
+                table {
+                    font-family: 'Roboto', sans-serif;
+                    font-size: 14px;
+                }
+                
+                paper-button {
+                    font-family: 'Roboto', sans-serif;
+                    font-size: 14px;
+                }
+                
+                .material-icons {
+                    font-family: 'Material Icons';
+                    font-weight: normal;
+                    font-style: normal;
+                    font-size: 24px;
+                    /* Preferred icon size */
+                    display: inline-block;
+                    line-height: 1;
+                    text-transform: none;
+                    letter-spacing: normal;
+                    word-wrap: normal;
+                    white-space: nowrap;
+                    direction: ltr;
+                    /* Support for all WebKit browsers. */
+                    -webkit-font-smoothing: antialiased;
+                    /* Support for Safari and Chrome. */
+                    text-rendering: optimizeLegibility;
+                    /* Support for Firefox. */
+                    -moz-osx-font-smoothing: grayscale;
+                    /* Support for IE. */
+                    font-feature-settings: 'liga';
+                }
+            </style>
+
+      <table>
+        <tr>
+          <th>
+
+            <paper-button><i class='material-icons'>folder_open</i>&nbsp;&nbsp;
+              <input type='file' id='input' multiple>
+            </paper-button>
+
+            <br />
+
+            <paper-button>
+              <i class='material-icons'>link</i>&nbsp;&nbsp;
+              <textarea rows='1' cols='30' type='url' id='inputurls'>sample-data/dicom/adi_brain/36444280
+                sample-data/dicom/adi_brain/36747024
+                sample-data/dicom/adi_brain/36747514
+                sample-data/dicom/adi_brain/36747934
+                sample-data/dicom/adi_brain/36748354
+                sample-data/dicom/adi_brain/36748816
+                sample-data/dicom/adi_brain/36749236
+                sample-data/dicom/adi_brain/36749670
+                sample-data/dicom/adi_brain/36444294
+                sample-data/dicom/adi_brain/36747043
+                sample-data/dicom/adi_brain/36747528
+                sample-data/dicom/adi_brain/36747948
+                sample-data/dicom/adi_brain/36748368
+                sample-data/dicom/adi_brain/36748830
+                sample-data/dicom/adi_brain/36749250
+                sample-data/dicom/adi_brain/36749684
+                sample-data/dicom/adi_brain/36444308
+                sample-data/dicom/adi_brain/36747062
+                sample-data/dicom/adi_brain/36747542
+                sample-data/dicom/adi_brain/36747962
+                sample-data/dicom/adi_brain/36748382
+                sample-data/dicom/adi_brain/36748844
+                sample-data/dicom/adi_brain/36749264
+                sample-data/dicom/adi_brain/36749698
+                sample-data/dicom/adi_brain/36444322
+                sample-data/dicom/adi_brain/36747136
+                sample-data/dicom/adi_brain/36747556
+                sample-data/dicom/adi_brain/36747976
+                sample-data/dicom/adi_brain/36748396
+                sample-data/dicom/adi_brain/36748858
+                sample-data/dicom/adi_brain/36749278
+                sample-data/dicom/adi_brain/36749712
+                sample-data/dicom/adi_brain/36444336
+                sample-data/dicom/adi_brain/36747150
+                sample-data/dicom/adi_brain/36747570
+                sample-data/dicom/adi_brain/36747990
+                sample-data/dicom/adi_brain/36748410
+                sample-data/dicom/adi_brain/36748872
+                sample-data/dicom/adi_brain/36749292
+                sample-data/dicom/adi_brain/36749726
+                sample-data/dicom/adi_brain/36444350
+                sample-data/dicom/adi_brain/36747164
+                sample-data/dicom/adi_brain/36747584
+                sample-data/dicom/adi_brain/36748004
+                sample-data/dicom/adi_brain/36748424
+                sample-data/dicom/adi_brain/36748886
+                sample-data/dicom/adi_brain/36749306
+                sample-data/dicom/adi_brain/36749740
+                sample-data/dicom/adi_brain/36444364
+                sample-data/dicom/adi_brain/36747178
+                sample-data/dicom/adi_brain/36747598
+                sample-data/dicom/adi_brain/36748018
+                sample-data/dicom/adi_brain/36748438
+                sample-data/dicom/adi_brain/36748900
+                sample-data/dicom/adi_brain/36749320
+                sample-data/dicom/adi_brain/36749754
+                sample-data/dicom/adi_brain/36444378
+                sample-data/dicom/adi_brain/36747192
+                sample-data/dicom/adi_brain/36747612
+                sample-data/dicom/adi_brain/36748032
+                sample-data/dicom/adi_brain/36748452
+                sample-data/dicom/adi_brain/36748914
+                sample-data/dicom/adi_brain/36749334
+                sample-data/dicom/adi_brain/36749768
+                sample-data/dicom/adi_brain/36444392
+                sample-data/dicom/adi_brain/36747206
+                sample-data/dicom/adi_brain/36747626
+                sample-data/dicom/adi_brain/36748046
+                sample-data/dicom/adi_brain/36748466
+                sample-data/dicom/adi_brain/36748928
+                sample-data/dicom/adi_brain/36749348
+                sample-data/dicom/adi_brain/36749782
+                sample-data/dicom/adi_brain/36444406
+                sample-data/dicom/adi_brain/36747220
+                sample-data/dicom/adi_brain/36747640
+                sample-data/dicom/adi_brain/36748060
+                sample-data/dicom/adi_brain/36748480
+                sample-data/dicom/adi_brain/36748942
+                sample-data/dicom/adi_brain/36749362
+                sample-data/dicom/adi_brain/36749796
+                sample-data/dicom/adi_brain/36444434
+                sample-data/dicom/adi_brain/36747234
+                sample-data/dicom/adi_brain/36747654
+                sample-data/dicom/adi_brain/36748074
+                sample-data/dicom/adi_brain/36748494
+                sample-data/dicom/adi_brain/36748956
+                sample-data/dicom/adi_brain/36749376
+                sample-data/dicom/adi_brain/36749810
+                sample-data/dicom/adi_brain/36444448
+                sample-data/dicom/adi_brain/36747248
+                sample-data/dicom/adi_brain/36747668
+                sample-data/dicom/adi_brain/36748088
+                sample-data/dicom/adi_brain/36748508
+                sample-data/dicom/adi_brain/36748970
+                sample-data/dicom/adi_brain/36749390
+                sample-data/dicom/adi_brain/36749824
+                sample-data/dicom/adi_brain/36444462
+                sample-data/dicom/adi_brain/36747262
+                sample-data/dicom/adi_brain/36747682
+                sample-data/dicom/adi_brain/36748102
+                sample-data/dicom/adi_brain/36748522
+                sample-data/dicom/adi_brain/36748984
+                sample-data/dicom/adi_brain/36749404
+                sample-data/dicom/adi_brain/36749838
+                sample-data/dicom/adi_brain/36444476
+                sample-data/dicom/adi_brain/36747276
+                sample-data/dicom/adi_brain/36747696
+                sample-data/dicom/adi_brain/36748116
+                sample-data/dicom/adi_brain/36748578
+                sample-data/dicom/adi_brain/36748998
+                sample-data/dicom/adi_brain/36749418
+                sample-data/dicom/adi_brain/36749852
+                sample-data/dicom/adi_brain/36444490
+                sample-data/dicom/adi_brain/36747290
+                sample-data/dicom/adi_brain/36747710
+                sample-data/dicom/adi_brain/36748130
+                sample-data/dicom/adi_brain/36748592
+                sample-data/dicom/adi_brain/36749012
+                sample-data/dicom/adi_brain/36749446
+                sample-data/dicom/adi_brain/36749866
+                sample-data/dicom/adi_brain/36444504
+                sample-data/dicom/adi_brain/36747304
+                sample-data/dicom/adi_brain/36747724
+                sample-data/dicom/adi_brain/36748144
+                sample-data/dicom/adi_brain/36748606
+                sample-data/dicom/adi_brain/36749026
+                sample-data/dicom/adi_brain/36749460
+                sample-data/dicom/adi_brain/36749880
+                sample-data/dicom/adi_brain/36444518
+                sample-data/dicom/adi_brain/36747318
+                sample-data/dicom/adi_brain/36747738
+                sample-data/dicom/adi_brain/36748158
+                sample-data/dicom/adi_brain/36748620
+                sample-data/dicom/adi_brain/36749040
+                sample-data/dicom/adi_brain/36749474
+                sample-data/dicom/adi_brain/36749894
+                sample-data/dicom/adi_brain/36444532
+                sample-data/dicom/adi_brain/36747332
+                sample-data/dicom/adi_brain/36747752
+                sample-data/dicom/adi_brain/36748172
+                sample-data/dicom/adi_brain/36748634
+                sample-data/dicom/adi_brain/36749054
+                sample-data/dicom/adi_brain/36749488
+                sample-data/dicom/adi_brain/36749908
+                sample-data/dicom/adi_brain/36746856
+                sample-data/dicom/adi_brain/36747346
+                sample-data/dicom/adi_brain/36747766
+                sample-data/dicom/adi_brain/36748186
+                sample-data/dicom/adi_brain/36748648
+                sample-data/dicom/adi_brain/36749068
+                sample-data/dicom/adi_brain/36749502
+                sample-data/dicom/adi_brain/36749922
+                sample-data/dicom/adi_brain/36746870
+                sample-data/dicom/adi_brain/36747360
+                sample-data/dicom/adi_brain/36747780
+                sample-data/dicom/adi_brain/36748200
+                sample-data/dicom/adi_brain/36748662
+                sample-data/dicom/adi_brain/36749082
+                sample-data/dicom/adi_brain/36749516
+                sample-data/dicom/adi_brain/36749936
+                sample-data/dicom/adi_brain/36746884
+                sample-data/dicom/adi_brain/36747374
+                sample-data/dicom/adi_brain/36747794
+                sample-data/dicom/adi_brain/36748214
+                sample-data/dicom/adi_brain/36748676
+                sample-data/dicom/adi_brain/36749096
+                sample-data/dicom/adi_brain/36749530
+                sample-data/dicom/adi_brain/36749950
+                sample-data/dicom/adi_brain/36746898
+                sample-data/dicom/adi_brain/36747388
+                sample-data/dicom/adi_brain/36747808
+                sample-data/dicom/adi_brain/36748228
+                sample-data/dicom/adi_brain/36748690
+                sample-data/dicom/adi_brain/36749110
+                sample-data/dicom/adi_brain/36749544
+                sample-data/dicom/adi_brain/36749964
+                sample-data/dicom/adi_brain/36746912
+                sample-data/dicom/adi_brain/36747402
+                sample-data/dicom/adi_brain/36747822
+                sample-data/dicom/adi_brain/36748242
+                sample-data/dicom/adi_brain/36748704
+                sample-data/dicom/adi_brain/36749124
+                sample-data/dicom/adi_brain/36749558
+                sample-data/dicom/adi_brain/36746926
+                sample-data/dicom/adi_brain/36747416
+                sample-data/dicom/adi_brain/36747836
+                sample-data/dicom/adi_brain/36748256
+                sample-data/dicom/adi_brain/36748718
+                sample-data/dicom/adi_brain/36749138
+                sample-data/dicom/adi_brain/36749572
+                sample-data/dicom/adi_brain/36746940
+                sample-data/dicom/adi_brain/36747430
+                sample-data/dicom/adi_brain/36747850
+                sample-data/dicom/adi_brain/36748270
+                sample-data/dicom/adi_brain/36748732
+                sample-data/dicom/adi_brain/36749152
+                sample-data/dicom/adi_brain/36749586
+                sample-data/dicom/adi_brain/36746954
+                sample-data/dicom/adi_brain/36747444
+                sample-data/dicom/adi_brain/36747864
+                sample-data/dicom/adi_brain/36748284
+                sample-data/dicom/adi_brain/36748746
+                sample-data/dicom/adi_brain/36749166
+                sample-data/dicom/adi_brain/36749600
+                sample-data/dicom/adi_brain/36746968
+                sample-data/dicom/adi_brain/36747458
+                sample-data/dicom/adi_brain/36747878
+                sample-data/dicom/adi_brain/36748298
+                sample-data/dicom/adi_brain/36748760
+                sample-data/dicom/adi_brain/36749180
+                sample-data/dicom/adi_brain/36749614
+                sample-data/dicom/adi_brain/36746982
+                sample-data/dicom/adi_brain/36747472
+                sample-data/dicom/adi_brain/36747892
+                sample-data/dicom/adi_brain/36748312
+                sample-data/dicom/adi_brain/36748774
+                sample-data/dicom/adi_brain/36749194
+                sample-data/dicom/adi_brain/36749628
+                sample-data/dicom/adi_brain/36746996
+                sample-data/dicom/adi_brain/36747486
+                sample-data/dicom/adi_brain/36747906
+                sample-data/dicom/adi_brain/36748326
+                sample-data/dicom/adi_brain/36748788
+                sample-data/dicom/adi_brain/36749208
+                sample-data/dicom/adi_brain/36749642
+                sample-data/dicom/adi_brain/36747010
+                sample-data/dicom/adi_brain/36747500
+                sample-data/dicom/adi_brain/36747920
+                sample-data/dicom/adi_brain/36748340
+                sample-data/dicom/adi_brain/36748802
+                sample-data/dicom/adi_brain/36749222
+                sample-data/dicom/adi_brain/36749656
+              </textarea>
+              &nbsp;&nbsp;
+              <button on-tap='LoadUrls'>Load</button>
+            </paper-button>
+
+            <ami-loader2 id='amiloader' files='[[files]]' urls='[[urls]]' series='{{series}}'></ami-loader2>
+
+            <div id='divdropzone' class='dropzone'>
+              <ami-viewer2 id='amiviewer' series='{{series}}' stackhelper={{stackhelper}} stack={{stack}} controls={{controls}}
+                camera={{camera}} threed={{threed}} scene={{scene}} renderer={{renderer}} index={{index}}>
+              </ami-viewer2>
+              <ami-widget2 id='amiwidget' stackhelper={{stackhelper}} stack={{stack}} controls=[[controls]] camera=[[camera]]
+                threed={{threed}} scene={{scene}} renderer={{renderer}} guiobjects={{guiobjects}} index={{index}}>
+              </ami-widget2>
+            </div>
+
+            <paper-button raised id='ClearWidgets1' class='widgetbutton' on-tap='ClearWidgets1'><i class='material-icons'>clear</i>&nbsp;&nbsp;Reset
+              Widgets
+            </paper-button>
+
+          </th>
+          <th>
+
+            <paper-button><i class='material-icons'>folder_open</i>&nbsp;&nbsp;
+              <input type='file' id='input2' multiple>
+            </paper-button>
+
+            <br />
+
+            <paper-button>
+              <i class='material-icons'>link</i>&nbsp;&nbsp;
+              <textarea rows='1' cols='30' type='url' id='inputurls2'>sample-data/dicom/adi_brain/36444280
+                sample-data/dicom/adi_brain/36747024
+                sample-data/dicom/adi_brain/36747514
+                sample-data/dicom/adi_brain/36747934
+                sample-data/dicom/adi_brain/36748354
+                sample-data/dicom/adi_brain/36748816
+                sample-data/dicom/adi_brain/36749236
+                sample-data/dicom/adi_brain/36749670
+                sample-data/dicom/adi_brain/36444294
+                sample-data/dicom/adi_brain/36747043
+                sample-data/dicom/adi_brain/36747528
+                sample-data/dicom/adi_brain/36747948
+                sample-data/dicom/adi_brain/36748368
+                sample-data/dicom/adi_brain/36748830
+                sample-data/dicom/adi_brain/36749250
+                sample-data/dicom/adi_brain/36749684
+                sample-data/dicom/adi_brain/36444308
+                sample-data/dicom/adi_brain/36747062
+                sample-data/dicom/adi_brain/36747542
+                sample-data/dicom/adi_brain/36747962
+                sample-data/dicom/adi_brain/36748382
+                sample-data/dicom/adi_brain/36748844
+                sample-data/dicom/adi_brain/36749264
+                sample-data/dicom/adi_brain/36749698
+                sample-data/dicom/adi_brain/36444322
+                sample-data/dicom/adi_brain/36747136
+                sample-data/dicom/adi_brain/36747556
+                sample-data/dicom/adi_brain/36747976
+                sample-data/dicom/adi_brain/36748396
+                sample-data/dicom/adi_brain/36748858
+                sample-data/dicom/adi_brain/36749278
+                sample-data/dicom/adi_brain/36749712
+                sample-data/dicom/adi_brain/36444336
+                sample-data/dicom/adi_brain/36747150
+                sample-data/dicom/adi_brain/36747570
+                sample-data/dicom/adi_brain/36747990
+                sample-data/dicom/adi_brain/36748410
+                sample-data/dicom/adi_brain/36748872
+                sample-data/dicom/adi_brain/36749292
+                sample-data/dicom/adi_brain/36749726
+                sample-data/dicom/adi_brain/36444350
+                sample-data/dicom/adi_brain/36747164
+                sample-data/dicom/adi_brain/36747584
+                sample-data/dicom/adi_brain/36748004
+                sample-data/dicom/adi_brain/36748424
+                sample-data/dicom/adi_brain/36748886
+                sample-data/dicom/adi_brain/36749306
+                sample-data/dicom/adi_brain/36749740
+                sample-data/dicom/adi_brain/36444364
+                sample-data/dicom/adi_brain/36747178
+                sample-data/dicom/adi_brain/36747598
+                sample-data/dicom/adi_brain/36748018
+                sample-data/dicom/adi_brain/36748438
+                sample-data/dicom/adi_brain/36748900
+                sample-data/dicom/adi_brain/36749320
+                sample-data/dicom/adi_brain/36749754
+                sample-data/dicom/adi_brain/36444378
+                sample-data/dicom/adi_brain/36747192
+                sample-data/dicom/adi_brain/36747612
+                sample-data/dicom/adi_brain/36748032
+                sample-data/dicom/adi_brain/36748452
+                sample-data/dicom/adi_brain/36748914
+                sample-data/dicom/adi_brain/36749334
+                sample-data/dicom/adi_brain/36749768
+                sample-data/dicom/adi_brain/36444392
+                sample-data/dicom/adi_brain/36747206
+                sample-data/dicom/adi_brain/36747626
+                sample-data/dicom/adi_brain/36748046
+                sample-data/dicom/adi_brain/36748466
+                sample-data/dicom/adi_brain/36748928
+                sample-data/dicom/adi_brain/36749348
+                sample-data/dicom/adi_brain/36749782
+                sample-data/dicom/adi_brain/36444406
+                sample-data/dicom/adi_brain/36747220
+                sample-data/dicom/adi_brain/36747640
+                sample-data/dicom/adi_brain/36748060
+                sample-data/dicom/adi_brain/36748480
+                sample-data/dicom/adi_brain/36748942
+                sample-data/dicom/adi_brain/36749362
+                sample-data/dicom/adi_brain/36749796
+                sample-data/dicom/adi_brain/36444434
+                sample-data/dicom/adi_brain/36747234
+                sample-data/dicom/adi_brain/36747654
+                sample-data/dicom/adi_brain/36748074
+                sample-data/dicom/adi_brain/36748494
+                sample-data/dicom/adi_brain/36748956
+                sample-data/dicom/adi_brain/36749376
+                sample-data/dicom/adi_brain/36749810
+                sample-data/dicom/adi_brain/36444448
+                sample-data/dicom/adi_brain/36747248
+                sample-data/dicom/adi_brain/36747668
+                sample-data/dicom/adi_brain/36748088
+                sample-data/dicom/adi_brain/36748508
+                sample-data/dicom/adi_brain/36748970
+                sample-data/dicom/adi_brain/36749390
+                sample-data/dicom/adi_brain/36749824
+                sample-data/dicom/adi_brain/36444462
+                sample-data/dicom/adi_brain/36747262
+                sample-data/dicom/adi_brain/36747682
+                sample-data/dicom/adi_brain/36748102
+                sample-data/dicom/adi_brain/36748522
+                sample-data/dicom/adi_brain/36748984
+                sample-data/dicom/adi_brain/36749404
+                sample-data/dicom/adi_brain/36749838
+                sample-data/dicom/adi_brain/36444476
+                sample-data/dicom/adi_brain/36747276
+                sample-data/dicom/adi_brain/36747696
+                sample-data/dicom/adi_brain/36748116
+                sample-data/dicom/adi_brain/36748578
+                sample-data/dicom/adi_brain/36748998
+                sample-data/dicom/adi_brain/36749418
+                sample-data/dicom/adi_brain/36749852
+                sample-data/dicom/adi_brain/36444490
+                sample-data/dicom/adi_brain/36747290
+                sample-data/dicom/adi_brain/36747710
+                sample-data/dicom/adi_brain/36748130
+                sample-data/dicom/adi_brain/36748592
+                sample-data/dicom/adi_brain/36749012
+                sample-data/dicom/adi_brain/36749446
+                sample-data/dicom/adi_brain/36749866
+                sample-data/dicom/adi_brain/36444504
+                sample-data/dicom/adi_brain/36747304
+                sample-data/dicom/adi_brain/36747724
+                sample-data/dicom/adi_brain/36748144
+                sample-data/dicom/adi_brain/36748606
+                sample-data/dicom/adi_brain/36749026
+                sample-data/dicom/adi_brain/36749460
+                sample-data/dicom/adi_brain/36749880
+                sample-data/dicom/adi_brain/36444518
+                sample-data/dicom/adi_brain/36747318
+                sample-data/dicom/adi_brain/36747738
+                sample-data/dicom/adi_brain/36748158
+                sample-data/dicom/adi_brain/36748620
+                sample-data/dicom/adi_brain/36749040
+                sample-data/dicom/adi_brain/36749474
+                sample-data/dicom/adi_brain/36749894
+                sample-data/dicom/adi_brain/36444532
+                sample-data/dicom/adi_brain/36747332
+                sample-data/dicom/adi_brain/36747752
+                sample-data/dicom/adi_brain/36748172
+                sample-data/dicom/adi_brain/36748634
+                sample-data/dicom/adi_brain/36749054
+                sample-data/dicom/adi_brain/36749488
+                sample-data/dicom/adi_brain/36749908
+                sample-data/dicom/adi_brain/36746856
+                sample-data/dicom/adi_brain/36747346
+                sample-data/dicom/adi_brain/36747766
+                sample-data/dicom/adi_brain/36748186
+                sample-data/dicom/adi_brain/36748648
+                sample-data/dicom/adi_brain/36749068
+                sample-data/dicom/adi_brain/36749502
+                sample-data/dicom/adi_brain/36749922
+                sample-data/dicom/adi_brain/36746870
+                sample-data/dicom/adi_brain/36747360
+                sample-data/dicom/adi_brain/36747780
+                sample-data/dicom/adi_brain/36748200
+                sample-data/dicom/adi_brain/36748662
+                sample-data/dicom/adi_brain/36749082
+                sample-data/dicom/adi_brain/36749516
+                sample-data/dicom/adi_brain/36749936
+                sample-data/dicom/adi_brain/36746884
+                sample-data/dicom/adi_brain/36747374
+                sample-data/dicom/adi_brain/36747794
+                sample-data/dicom/adi_brain/36748214
+                sample-data/dicom/adi_brain/36748676
+                sample-data/dicom/adi_brain/36749096
+                sample-data/dicom/adi_brain/36749530
+                sample-data/dicom/adi_brain/36749950
+                sample-data/dicom/adi_brain/36746898
+                sample-data/dicom/adi_brain/36747388
+                sample-data/dicom/adi_brain/36747808
+                sample-data/dicom/adi_brain/36748228
+                sample-data/dicom/adi_brain/36748690
+                sample-data/dicom/adi_brain/36749110
+                sample-data/dicom/adi_brain/36749544
+                sample-data/dicom/adi_brain/36749964
+                sample-data/dicom/adi_brain/36746912
+                sample-data/dicom/adi_brain/36747402
+                sample-data/dicom/adi_brain/36747822
+                sample-data/dicom/adi_brain/36748242
+                sample-data/dicom/adi_brain/36748704
+                sample-data/dicom/adi_brain/36749124
+                sample-data/dicom/adi_brain/36749558
+                sample-data/dicom/adi_brain/36746926
+                sample-data/dicom/adi_brain/36747416
+                sample-data/dicom/adi_brain/36747836
+                sample-data/dicom/adi_brain/36748256
+                sample-data/dicom/adi_brain/36748718
+                sample-data/dicom/adi_brain/36749138
+                sample-data/dicom/adi_brain/36749572
+                sample-data/dicom/adi_brain/36746940
+                sample-data/dicom/adi_brain/36747430
+                sample-data/dicom/adi_brain/36747850
+                sample-data/dicom/adi_brain/36748270
+                sample-data/dicom/adi_brain/36748732
+                sample-data/dicom/adi_brain/36749152
+                sample-data/dicom/adi_brain/36749586
+                sample-data/dicom/adi_brain/36746954
+                sample-data/dicom/adi_brain/36747444
+                sample-data/dicom/adi_brain/36747864
+                sample-data/dicom/adi_brain/36748284
+                sample-data/dicom/adi_brain/36748746
+                sample-data/dicom/adi_brain/36749166
+                sample-data/dicom/adi_brain/36749600
+                sample-data/dicom/adi_brain/36746968
+                sample-data/dicom/adi_brain/36747458
+                sample-data/dicom/adi_brain/36747878
+                sample-data/dicom/adi_brain/36748298
+                sample-data/dicom/adi_brain/36748760
+                sample-data/dicom/adi_brain/36749180
+                sample-data/dicom/adi_brain/36749614
+                sample-data/dicom/adi_brain/36746982
+                sample-data/dicom/adi_brain/36747472
+                sample-data/dicom/adi_brain/36747892
+                sample-data/dicom/adi_brain/36748312
+                sample-data/dicom/adi_brain/36748774
+                sample-data/dicom/adi_brain/36749194
+                sample-data/dicom/adi_brain/36749628
+                sample-data/dicom/adi_brain/36746996
+                sample-data/dicom/adi_brain/36747486
+                sample-data/dicom/adi_brain/36747906
+                sample-data/dicom/adi_brain/36748326
+                sample-data/dicom/adi_brain/36748788
+                sample-data/dicom/adi_brain/36749208
+                sample-data/dicom/adi_brain/36749642
+                sample-data/dicom/adi_brain/36747010
+                sample-data/dicom/adi_brain/36747500
+                sample-data/dicom/adi_brain/36747920
+                sample-data/dicom/adi_brain/36748340
+                sample-data/dicom/adi_brain/36748802
+                sample-data/dicom/adi_brain/36749222
+                sample-data/dicom/adi_brain/36749656
+              </textarea>
+              &nbsp;&nbsp;
+              <button on-tap='LoadUrls2'>Load</button>
+            </paper-button>
+
+            <ami-loader2 id='amiloader2' files='[[files2]]' urls='[[urls2]]' series='{{series2}}'></ami-loader2>
+
+            <div id='divdropzone2' class='dropzone'>
+              <ami-viewer2 id='amiviewer2' series='{{series2}}' stackhelper={{stackhelper2}} stack={{stack2}} controls={{controls2}}
+                camera={{camera2}} threed={{threed2}} scene={{scene2}} renderer={{renderer2}} index={{index2}}>
+              </ami-viewer2>
+              <ami-widget2 id='amiwidget2' stackhelper={{stackhelper2}} stack={{stack2}} controls=[[controls2]] camera=[[camera2]]
+                threed={{threed2}} scene={{scene2}} renderer={{renderer2}} guiobjects={{guiobjects2}} index={{index2}}>
+              </ami-widget2>
+            </div>
+
+            <paper-button raised id='ClearWidgets2' class='widgetbutton' on-tap='ClearWidgets2'><i class='material-icons'>clear</i>&nbsp;&nbsp;Reset
+              Widgets
+            </paper-button>
+
+          </th>
+
+          <th>
+            <paper-button raised id='ButtonWidgetHandle' class='widgetbutton' on-tap='ActivateWidgetHandle'><i class='material-icons'>radio_button_checked</i>&nbsp;&nbsp;Handle</paper-button>
+            <br />
+            <br />
+            <paper-button raised id='ButtonWidgetRuler' class='widgetbutton' on-tap='ActivateWidgetRuler'><i class='material-icons'>straighten</i>&nbsp;&nbsp;Ruler</paper-button>
+            <br />
+            <br />
+            <!-- <paper-button raised id='ButtonWidgetVoxelProbe' class='widgetbutton' on-tap='ActivateWidgetVoxelProbe'>VoxelProbe</paper-button> -->
+            <paper-button raised id='ButtonWidgetAnnotation' class='widgetbutton' on-tap='ActivateWidgetAnnotation'><i
+                class='material-icons'>call_made</i>&nbsp;&nbsp;Annotation</paper-button>
+            <br />
+            <br />
+            <paper-button raised id='ButtonWidgetRoi' class='widgetbutton' on-tap='ActivateWidgetRoi'><i class='material-icons'>panorama_fish_eye</i>&nbsp;&nbsp;Roi</paper-button>
+            <br />
+            <br />
+            <paper-button raised id='ButtonMove' class='widgetbutton' on-tap='ActivateMove'><i class='material-icons'>pan_tool</i>&nbsp;&nbsp;Move</paper-button>
+          </th>
+
+        </tr>
+      </table>
+
+      <table>
+        <tr>
+          <th>
+            <table border='1' style='width:420px' id='tableTumour'>
+              <tr>
+                <th>Lesion</th>
+                <th>Short Axis (mm)</th>
+                <th>Long Axis (mm)</th>
+                <th>Nodal</th>
+              </tr>
+            </table>
+          </th>
+          <th>
+            <table border='1' style='width:420px' id='tableTumour2'>
+              <tr>
+                <th>Lesion</th>
+                <th>Short Axis (mm)</th>
+                <th>Long Axis (mm)</th>
+                <th>Nodal</th>
+              </tr>
+            </table>
+          </th>
+        </tr>
+      </table>
+
+      <br />
+      <br />
+
+      <div style='width:840px'>
+        <center>
+          <paper-button raised id='Evaluate' class='widgetbutton' on-tap='evaluateGrowth'><i class='material-icons'>assignment</i>&nbsp;&nbsp;<strong>Evaluate</strong></paper-button><strong></strong>
+          <br />
+          <br />
+          <table border='1' style='width:30%' id='progresion'>
+            <tr>
+              <th>PROGRESION</th>
+              <th>Description</th>
+              <th>Difference</th>
+            </tr>
+          </table>
+        </center>
+      </div>
+
+  </body>
+  </template>
+
+  <script>
+    class AmiApp extends Polymer.GestureEventListeners(Polymer.Element) {
+      static get is() {
+        return 'ami-app';
+      }
+      static get properties() {
+        return {
+          // properties
+        };
+      }
+      constructor() {
+        super();
+      }
+
+
+      ready() {
+        super.ready();
+
+        Polymer.dom(this.root).querySelector('#input').addEventListener('change', this.attachFiles.bind(this), false);
+        Polymer.dom(this.root).querySelector('#input2').addEventListener('change', this.attachFiles2.bind(this), false);
+
+        Polymer.dom(this.root).querySelector('#amiwidget').addEventListener('widgetsChanged', function (e) {
+          this.Evaluate();
+        }.bind(this));
+
+        Polymer.dom(this.root).querySelector('#amiwidget2').addEventListener('widgetsChanged', function (e) {
+          this.Evaluate();
+        }.bind(this));
+
+        Polymer.dom(this.root).querySelector('#amiloader').addEventListener('loaded', function (e) {
+          Polymer.dom(this.root).querySelector('#amiwidget').init();
+        }.bind(this));
+
+        Polymer.dom(this.root).querySelector('#amiloader2').addEventListener('loaded', function (e) {
+          Polymer.dom(this.root).querySelector('#amiwidget2').init();
+        }.bind(this));
+      }
+
+
+      LoadUrls() {
+        const inputurls = Polymer.dom(this.root).querySelector('#inputurls').value;
+        Polymer.dom(this.root).querySelector('#amiloader').urls = inputurls.split('\n');
+      }
+
+      LoadUrls2() {
+        const inputurls2 = Polymer.dom(this.root).querySelector('#inputurls2').value;
+        Polymer.dom(this.root).querySelector('#amiloader2').urls = inputurls2.split('\n');
+      }
+
+      attachFiles(evt) {
+        // convert files object to array
+        var files = [];
+        for (var i = 0; i < evt.target.files.length; i++) {
+          files.push(evt.target.files[i]);
+        }
+        Polymer.dom(this.root).querySelector('#amiloader').files = files;
+      }
+
+      attachFiles2(evt) {
+        // convert files object to array
+        var files = [];
+        for (var i = 0; i < evt.target.files.length; i++) {
+          files.push(evt.target.files[i]);
+        }
+        Polymer.dom(this.root).querySelector('#amiloader2').files = files;
+      }
+
+
+      restartbackgroundbuttons(classname) {
+        var elements = Polymer.dom(this.root).querySelectorAll('.' + classname);
+        for (var i = 0; i < elements.length; i++) {
+          elements[i].style.backgroundColor = 'initial';
+        }
+      }
+
+      ActivateWidgetHandle() {
+        this.restartbackgroundbuttons('widgetbutton');
+        Polymer.dom(this.root).querySelector('#ButtonWidgetHandle').style.background = '#81D4FA';
+        Polymer.dom(this.root).querySelector('#amiwidget').guiobjects = { type: 'Handle' };
+        Polymer.dom(this.root).querySelector('#amiwidget2').guiobjects = { type: 'Handle' };
+      }
+
+      ActivateWidgetRuler() {
+        this.restartbackgroundbuttons('widgetbutton');
+        Polymer.dom(this.root).querySelector('#ButtonWidgetRuler').style.background = '#81D4FA';
+        Polymer.dom(this.root).querySelector('#amiwidget').guiobjects = { type: 'Ruler' };
+        Polymer.dom(this.root).querySelector('#amiwidget2').guiobjects = { type: 'Ruler' };
+      }
+
+      ActivateWidgetVoxelProbe() {
+        this.restartbackgroundbuttons('widgetbutton');
+        Polymer.dom(this.root).querySelector('#ButtonWidgetVoxelProbe').style.background = '#81D4FA';
+        Polymer.dom(this.root).querySelector('#amiwidget').guiobjects = { type: 'VoxelProbe' };
+        Polymer.dom(this.root).querySelector('#amiwidget2').guiobjects = { type: 'VoxelProbe' };
+      }
+
+      ActivateWidgetAnnotation() {
+        this.restartbackgroundbuttons('widgetbutton');
+        Polymer.dom(this.root).querySelector('#ButtonWidgetAnnotation').style.background = '#81D4FA';
+        Polymer.dom(this.root).querySelector('#amiwidget').guiobjects = { type: 'Annotation' };
+        Polymer.dom(this.root).querySelector('#amiwidget2').guiobjects = { type: 'Annotation' };
+      }
+
+      ActivateWidgetRoi() {
+        this.restartbackgroundbuttons('widgetbutton');
+        Polymer.dom(this.root).querySelector('#ButtonWidgetRoi').style.background = '#81D4FA';
+        Polymer.dom(this.root).querySelector('#amiwidget').guiobjects = { type: 'Roi' };
+        Polymer.dom(this.root).querySelector('#amiwidget2').guiobjects = { type: 'Roi' };
+      }
+
+      ActivateMove() {
+        this.restartbackgroundbuttons('widgetbutton');
+        Polymer.dom(this.root).querySelector('#ButtonMove').style.background = '#81D4FA';
+        Polymer.dom(this.root).querySelector('#amiwidget').guiobjects = { type: null };
+        Polymer.dom(this.root).querySelector('#amiwidget2').guiobjects = { type: null };
+      }
+
+      ClearWidgets1() {
+        this.restartbackgroundbuttons('widgetbutton');
+        Polymer.dom(this.root).querySelector('#amiviewer').ClearDOMWidgets();
+        Polymer.dom(this.root).querySelector('#amiwidget').RemoveWidgets();
+        Polymer.dom(this.root).querySelector('#amiwidget').guiobjects = { type: null };
+        Polymer.dom(this.root).querySelector('#amiwidget2').guiobjects2 = { type: null };
+      }
+
+      ClearWidgets2() {
+        this.restartbackgroundbuttons('widgetbutton');
+        Polymer.dom(this.root).querySelector('#amiviewer2').ClearDOMWidgets();
+        Polymer.dom(this.root).querySelector('#amiwidget2').RemoveWidgets();
+        Polymer.dom(this.root).querySelector('#amiwidget').guiobjects = { type: null };
+        Polymer.dom(this.root).querySelector('#amiwidget2').guiobjects2 = { type: null };
+      }
+
+      RoiToBidirectionalRuler() {
+        this.restartbackgroundbuttons('widgetbutton');
+        Polymer.dom(this.root).querySelector('#amiwidget').RoiToBidirectionalRuler();
+        Polymer.dom(this.root).querySelector('#amiwidget2').RoiToBidirectionalRuler();
+        widgetelement.guiobjects = { type: null };
+        widgetelement2.guiobjects2 = { type: null };
+      }
+
+      checkInput(widgetsInfo) {
+        var numberOfRulers = 0;
+        for (var i in widgetsInfo) {
+          if (widgetsInfo[i] !== null) {
+            var widget = widgetsInfo[i];
+            if (widget['constructor'] === 'WidgetsRuler') {
+              numberOfRulers = numberOfRulers + 1;
+            }
+          }
+        }
+        if (numberOfRulers < 2) {
+          alert('To evaluate the growth, both viewer should have at least two rulers');
+          return false; // input is wrong
+        }
+        return true; // input is ok
+      }
+
+      Evaluate() {
+        this.restartbackgroundbuttons('widgetbutton');
+        var widgetsInfo1 = Polymer.dom(this.root).querySelector('#amiwidget').GetWidgets();
+        var widgetsInfo2 = Polymer.dom(this.root).querySelector('#amiwidget2').GetWidgets();
+        this.displayTable(widgetsInfo1, widgetsInfo2);
+      }
+
+      orderDistances(ArrayDistances) {
+        Array.prototype.max = function () {
+          return Math.max.apply(null, this);
+        };
+
+        Array.prototype.min = function () {
+          return Math.min.apply(null, this);
+        };
+
+        var minDistance = null;
+        var maxDistance = null;
+
+        minDistance = ArrayDistances.min();
+        maxDistance = ArrayDistances.max();
+
+        var orderedDistances = [minDistance, maxDistance];
+
+        return orderedDistances;
+      }
+
+      extractDistances(allWidgetsInfo) {
+        var distances = [];
+
+        for (let index in allWidgetsInfo) {
+
+          var widgetsInfo = allWidgetsInfo[index];
+
+          for (var i = 1; i < widgetsinfo.length; i++) {
+            if (widgetsInfo[i] !== null) {
+              var widget = widgetsInfo[i];
+              if (widget['constructor'] === 'WidgetsRuler') {
+                var distancearray = []
+                var distance = widget['distance'];
+                //console.log('distance ' + distance);
+                distance = distance.split(' ');
+                distance = parseFloat(distance[0]);
+                distancearray.push(distance);
+
+                i = i + 1;
+                if (widgetsInfo[i] !== undefined) {
+                  var widget2 = widgetsInfo[i];
+                  if (widget2['constructor'] === 'WidgetsRuler') {
+                    var distance = widget2['distance'];
+                    distance = distance.split(' ');
+                    distance = parseFloat(distance[0]);
+                    distancearray.push(distance);
+                  } else {
+                    return false;
+                  }
+                  distances.push(this.orderDistances(distancearray));
+                } else {
+                  return false;
+                }
+
+              }
+            }
+          }
+        }
+        return distances;
+      }
+
+
+      insertCell(distance) {
+        return '<th>' + distance + '</th>';
+      }
+
+
+      insertNodal(distance) {
+        if (distance[0] >= 15)
+          return '<th>' + 'Nodal' + '</th>';
+        else if (distance[1] >= 10)
+          return '<th>' + 'Non-Nodal' + '</th>';
+        else
+          return '<th>' + 'Non-Target' + '</th>';
+      }
+
+      insertSiteOfLesion() {
+        const code = '<th> \
+      <select class="selectSite"> \
+        <option value="1" selected="selected">Other</option> \
+        <option value="2">Bone</option> \
+        <option value="3">Pleural - pericardial effusion and ascites</option> \
+        <option value="4">Inflammatory breast disease</option> \
+        <option value="5">Lymphangitiscutis/pulmonis</option> \
+        <option value="6">Cystic lesions</option> \
+        <option value="7">Leptomeningeal disease</option> \
+      </select> \
+      </th>'
+        return code;
+      }
+
+      insertEvaluationMethod() {
+        const code = '<th> \
+      <select class="selectMethod"> \
+        <option value="1" selected="selected">CT Scan</option> \
+        <option value="2">Chest X-ray</option> \
+        <option value="3">Calipers</option> \
+      </select> \
+      </th>'
+        return code;
+      }
+
+      insertInput() {
+        const code = '<th> \
+      <input type="text"> \
+      </th>'
+        return code;
+      }
+
+      createTumorRow(tableId, distance) {
+        $(Polymer.dom(this.root).querySelector('#' + tableId)).append(
+          '<tr>' +
+          this.insertInput() +
+          this.insertCell(distance[0]) +
+          this.insertCell(distance[1]) +
+          this.insertNodal(distance) +
+          '</tr>'
+        )
+
+        return
+      }
+
+      createTumorRows(tableId, distances) {
+        $(Polymer.dom(this.root).querySelector('#' + tableId)).find('tr:gt(0)').remove();//remove all rows
+        for (var i = 0; i < distances.length; i++) {
+          if (Array.isArray(distances[i]))
+            this.createTumorRow(tableId, distances[i]);
+        }
+        return
+      }
+
+
+      displayTable(widgetsinfo1, widgetsinfo2) {
+        var distancesViewer1 = this.extractDistances(widgetsinfo1);
+        var distancesViewer2 = this.extractDistances(widgetsinfo2);
+
+        if (distancesViewer1 !== false)
+          this.createTumorRows('tableTumour', distancesViewer1);
+
+        if (distancesViewer2 !== false)
+          this.createTumorRows('tableTumour2', distancesViewer2);
+
+      }
+
+
+      getTableColumnText(tableId, column) {
+        var array = [];
+        var end = false;
+        var i = 1;
+        while (end === false) {
+          try {
+            var value = Polymer.dom(this.root).querySelector('#' + tableId).rows[i].cells[column].innerHTML;
+            array.push(value);
+            i = i + 1;
+          } catch (e) {
+            end = true;
+          }
+        }
+        return array;
+      }
+
+      getTableColumnValue(selector) {
+        var array = [];
+        var end = false;
+        var i = 0;
+        while (end === false) {
+          try {
+            var element = Polymer.dom(this.root).querySelectorAll(selector)[i];
+            var selection = element.options[element.selectedIndex].value;
+            array.push(selection);
+            i = i + 1;
+          } catch (e) {
+            end = true;
+          }
+        }
+        return array;
+      }
+
+      getSumOfArray(array, nodal) {
+        var sum = 0;
+        for (var i = 0; i < array.length; i++) {
+          var element = array[i];
+          if (nodal[i] === 'Nodal')
+            sum = sum + element[0];
+          if (nodal[i] === 'Non-Nodal')
+            sum = sum + element[1];
+          if (nodal[i] === 'Non-Target')
+            sum = sum;
+        }
+        return sum;
+      }
+
+
+      insertProgresion(state) {
+        if (state === 3)
+          return '<th>Progressice Desease (PD)</th>';
+        if (state === 2)
+          return '<th>Stable Diease (SD)</th>';
+        if (state === 1)
+          return '<th>Partial Response (PR)</th>';
+        if (state === 0)
+          return '<th>Complete Response (CR)</th>';
+      }
+
+      insertDescription(state) {
+        if (state === 3)
+          return '<th>Increase of ≥ 20%</th>';
+        if (state === 2)
+          return '<th>> -30% and ≤ 20%</th>';
+        if (state === 1)
+          return '<th>Decrease of ≥ 30%</th>';
+        if (state === 0)
+          return '<th>All lesions have disappeared</th>';
+      }
+
+      insertGrowth(growth) {
+        var difference;
+        if (growth > 1)
+          difference = (growth * 100) - 100;
+        if (growth < 1)
+          difference = ((growth * 100) - 100);
+        return '<th>' + difference.toFixed(2) + '%</th>';
+      }
+
+      insertResults(state, growth) {
+        $(Polymer.dom(this.root).querySelector('#progresion')).find('tr:gt(0)').remove();
+        $(Polymer.dom(this.root).querySelector('#progresion')).append(
+          '<tr>' +
+          this.insertProgresion(state) +
+          this.insertDescription(state) +
+          this.insertGrowth(growth) +
+          '</tr>'
+        );
+      }
+
+      checkNewLesions(nodal1, nodal2) {
+        var TargetLesions1 = nodal1.filter(i => i === 'Nodal') + nodal1.filter(i => i === 'Non-Nodal')
+        var TargetLesions2 = nodal2.filter(i => i === 'Nodal') + nodal2.filter(i => i === 'Non-Nodal')
+        if (TargetLesions2 > TargetLesions1) {
+          return true;
+        }
+        return false;
+      }
+
+
+      evaluateGrowth() {
+        var widgetsinfo1 = Polymer.dom(this.root).querySelector('#amiwidget').GetWidgets();
+        var widgetsinfo2 = Polymer.dom(this.root).querySelector('#amiwidget2').GetWidgets();
+        var distancesViewer1 = this.extractDistances(widgetsinfo1);
+        var distancesViewer2 = this.extractDistances(widgetsinfo2);
+
+        var nodal1 = this.getTableColumnText('tableTumour', 3);
+
+        var nodal2 = this.getTableColumnText('tableTumour2', 3);
+
+        var sum1 = this.getSumOfArray(distancesViewer1, nodal1);
+        var sum2 = this.getSumOfArray(distancesViewer2, nodal2);
+
+        const growth = sum2 / sum1;
+        var state;
+        if (growth > 1.2) {
+          state = 3;
+        }
+
+        if (growth < 1.2 && growth > 0.7) {
+          state = 2;
+        }
+
+        if (growth < 0.7) {
+          state = 1;
+        }
+
+        if (growth === 0) {
+          state = 0;
+        }
+
+        if (this.checkNewLesions(nodal1, nodal2)) { // if new lesions, PD
+          state = 3;
+        }
+
+        this.insertResults(state, growth);
+      }
+    }
+
+    window.customElements.define(AmiApp.is, AmiApp);
+  </script>
+</dom-module>
+
+</html>

@@ -1,0 +1,210 @@
+<link rel="import" href="/bower_components/polymer/polymer.html">
+<link rel="import" href="/bower_components/polymer/polymer-element.html">
+<link rel="import" href="/bower_components/ami-import/ami-import.html">
+
+
+<!--
+AMI Loader element!
+
+`ami-loader2` takes an array of urls or files then parse it and returns data organized by series/stacks/frames in Polymer 2.
+
+```
+series
+  - series 0
+  - series 1
+    - stack 0
+      - frame 0
+      - frame 1
+      - ...
+    - ...
+  - ...
+```
+
+@demo demo/index.html
+-->
+
+
+<dom-module id="ami-loader2">
+
+  <script>
+
+    class AmiLoader2 extends Polymer.Element {
+
+      static get is() { return 'ami-loader2'; }
+
+      static get properties() {
+        return {
+          /**
+           * Urls to load series from.
+           *
+           */
+          urls: {
+            type: Array,
+            value: [],
+            notify: true,
+            observer: '_urlsChanged'
+          },
+          /**
+           * Files to parse series from.
+           *
+           */
+          files: {
+            type: Array,
+            value: [],
+            observer: '_filesChanged'
+          },
+          status: {
+            type: Number,
+            value: 0
+          },
+          progress: {
+            type: Number,
+            value: 0
+          },
+          loader: {
+            type: Object,
+            value: null
+          },
+          series: {
+            type: Array,
+            value: []
+          }
+        };
+      }
+
+
+      _loadSequence(url) {
+        console.log('ami-loader2 _loadSequence');
+
+        // create the load sequence
+        let self = this;
+
+        return Promise.resolve()
+          // fetch the file
+          .then(function () {
+            return self.loader.fetch(url);
+          })
+          // parse the file
+          .then(function (data) {
+            return self.loader.parse(data);
+          })
+          // update the series container
+          .then(function (series) {
+            self.series.push(series);
+          })
+          .catch(function (error) {
+            window.console.log('oops... something went wrong...');
+            window.console.log(error);
+          });
+      }
+
+      _urlsChanged() {
+        console.log('ami-loader2 _urlsChanged');
+        console.log(this.urls);
+        // prepare the load sequence for each url!
+        if (!this.urls || this.urls.length <= 0) {
+          return;
+        }
+
+        this.loader = new AMI.default.Loaders.Volume();
+        this.series = [];
+
+        let loadSequences = [];
+        let self = this;
+        this.urls.forEach(function (url) {
+          loadSequences.push(self._loadSequence(url))
+        });
+
+        // fetch the data!
+        this.startSequences(loadSequences);
+
+      }
+
+      _parseSequence(file) {
+
+        console.log('ami-loader2 _parseSequence');
+
+        // create the load sequence
+        let self = this;
+
+        return Promise.resolve()
+          // upload the file to browser
+          .then(function () {
+            return new Promise(function (resolve, reject) {
+              let myReader = new FileReader();
+              // should handle errors too...
+              myReader.addEventListener('load', function (e) {
+                resolve(e.target.result);
+              });
+              myReader.readAsArrayBuffer(file);
+            });
+          })
+          // parse the file
+          .then(function (buffer) {
+            let data = {
+              url: file.name,
+              buffer: buffer
+            }
+            return self.loader.parse(data);
+          })
+          // update the series container
+          .then(function (series) {
+            self.series.push(series);
+          })
+          .catch(function (error) {
+            window.console.log('oops... something went wrong...');
+            window.console.log(error);
+          });
+      }
+
+      _filesChanged() {
+        console.log('ami-loader2 _filesChanged');
+        // prepare the parse sequence for each file!
+        if (!this.files || this.files.length <= 0) {
+
+          return;
+
+        }
+
+        this.loader = new AMI.default.Loaders.Volume();
+        this.series = [];
+
+        let parseSequences = [];
+        let self = this;
+        this.files.forEach(function (file) {
+          parseSequences.push(self._parseSequence(file));
+        });
+
+        this.startSequences(parseSequences);
+      }
+
+      startSequences(sequences) {
+
+        console.log('ami-loader2 startSequences');
+
+        let self = this;
+        Promise
+          .all(sequences)
+          .then(function () {
+
+            // cleanup the loader
+            self.loader.free();
+            self.loader = null;
+
+            // merge duplicate data if any
+            self.series = self.series[0].mergeSeries(self.series);
+
+            // emit series changed event!
+            //self.fire( 'series-changed' ); //fire is deprecated
+            self.dispatchEvent(new CustomEvent('series-changed', { bubbles: true }));
+
+            //self.fire( 'loaded' ); //fire is deprecated
+            self.dispatchEvent(new CustomEvent('loaded', { bubbles: true }));
+
+            console.log('ami-loader2 startSequences Finished');
+          });
+      }
+    }
+    customElements.define(AmiLoader2.is, AmiLoader2);
+  </script>
+</dom-module>
