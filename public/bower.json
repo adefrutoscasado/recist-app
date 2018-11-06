@@ -1,0 +1,8 @@
+{
+  "name": "polymer-app",
+  "private": true,
+  "dependencies": {
+    "polymer": "Polymer/polymer#2",
+    "ami-import": "NicolasRannou/ami-import#^v0.0.21"
+  }
+}

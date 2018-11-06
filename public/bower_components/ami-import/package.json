@@ -1,0 +1,28 @@
+{
+  "name": "ami-import",
+  "version": "0.0.14",
+  "description": "AMI JS Import for Polymer - no goodies, no bundles, nothing else. Just ami.js and threejs.min.js.",
+  "main": "index.js",
+  "directories": {
+    "test": "test"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/NicolasRannou/ami-import.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/NicolasRannou/ami-import/issues"
+  },
+  "homepage": "https://github.com/NicolasRannou/ami-import#readme",
+  "devDependencies" : {
+    "three": "^0.84.0"
+  },
+  "scripts" : {
+    "postinstall": "( cp node_modules/three/build/three.min.js . ) && (git commit -am $npm_package_version) && (git tag $npm_package_version) && (git push origin master) && (git push --tags)"
+  }
+}

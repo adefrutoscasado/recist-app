@@ -1,0 +1,893 @@
+<link rel="import" href="/bower_components/polymer/polymer.html">
+<link rel="import" href="/bower_components/polymer/polymer-element.html">
+<link rel="import" href="/bower_components/ami-import/ami-import.html">
+
+<!--
+AMI Viewer element!
+`ami-viewer` takes an array of data organized by series/stacks/frames (provided by the [ami-loader](http://fnndsc.github.io/ami-loader) and displays it.
+@demo demo/index.html
+-->
+
+<dom-module id="ami-widget2">
+  <template>
+
+  </template>
+
+  <script>
+
+    class AmiWidget2 extends Polymer.Element {
+      static get is() { return 'ami-widget2'; }
+
+      static get properties() {
+        return {
+          stackhelper: {
+            type: Object,
+            value: null,
+            notify: true
+          },
+
+          stack: {
+            type: Object,
+            value: null,
+            notify: true
+          },
+
+          camera: {
+            type: Object,
+            value: null,
+            notify: true
+          },
+
+          controls: {
+            type: Object,
+            value: null,
+            notify: true
+          },
+
+          widgets: {
+            type: Array,
+            value: [],
+            notify: true
+            //observer: '_widgetadded'
+          },
+
+          threed: {
+            type: Object,
+            value: null,
+            notify: true
+          },
+
+          scene: {
+            type: Object,
+            value: null,
+            notify: true
+          },
+
+          guiobjects: { //Handle by default
+            type: Object,
+            value: {
+              type: null,
+            },
+            notify: true
+          },
+
+          widgetsinfo: {
+            type: Object,
+            value: function () { return {}; }
+          },
+
+          initbool: {
+            type: Boolean,
+            value: false
+          },
+
+          index: {
+            type: Number,
+            notify: true,
+            observer: '_indexChanged'
+          }
+
+        };
+      }
+
+
+      init() {
+        if (this.initbool) {
+          return;
+        }
+
+        const self = this;
+
+        window.addEventListener('resize', e => this.onWindowResize(e));
+
+        this.onWindowResize();
+
+        this.threed.addEventListener('mouseup', function (evt) {
+          for (let widget of self.widgets) {
+            if (widget.active) {
+              widget.onEnd(evt);
+              self.SaveWidgets(self.index);
+              return;
+            }
+          }
+        });
+
+        this.threed.addEventListener('mousemove', function (evt) {
+          let cursor = 'default';
+          for (let widget of self.widgets) {
+            let evtnew = Object.assign({}, evt)
+            widget.onMove(evt);
+            if (widget.hovered) {
+              cursor = 'pointer';
+            }
+          }
+        });
+
+        this.threed.addEventListener('mousedown', function (evt) {
+          for (let widget of self.widgets) {
+            if (widget.hovered) {
+              widget.onStart(evt);
+              return;
+            }
+          }
+
+          const body = document.body;
+          const docEl = document.documentElement;
+          let scrollTop = Math.floor(window.pageYOffset || body.scrollTop);
+          // mouse position
+          let mouse = {
+            x: ((evt.clientX - self.offsets.left) / self.threed.offsetWidth * 2 - 1),
+            y: (-((evt.clientY - self.offsets.top + scrollTop) / self.threed.offsetHeight) * 2 + 1)
+          };
+
+          // update the raycaster
+          let raycaster = new THREE.Raycaster();
+          raycaster.setFromCamera(mouse, self.camera);
+          let intersects = raycaster.intersectObject(self.stackhelper.slice.mesh);
+
+          if (intersects.length <= 0) {
+            return;
+          }
+
+          let widget = null;
+          switch (self.guiobjects.type) {
+            case null:
+              return
+            case 'Handle':
+              widget =
+                new AMI.default.Widgets.Handle(self.stackhelper.slice.mesh, self.controls, self.camera, self.threed);
+              widget.worldPosition = intersects[0].point;
+              break;
+            case 'Ruler':
+              widget =
+                new AMI.default.Widgets.Ruler(self.stackhelper.slice.mesh, self.controls, self.camera, self.threed);
+              widget.worldPosition = intersects[0].point;
+              break;
+            case 'VoxelProbe':
+              widget =
+                new AMI.default.Widgets.VoxelProbe(self.stack, self.stackhelper.slice.mesh, self.controls, self.camera, self.threed);
+              widget.worldPosition = intersects[0].point;
+              break;
+            case 'Annotation':
+              widget =
+                new AMI.default.Widgets.Annotation(self.stackhelper.slice.mesh, self.controls, self.camera, self.threed);
+              widget.worldPosition = intersects[0].point;
+              break;
+            case 'BidirectionalRuler':
+              widget =
+                new AMI.default.Widgets.Annotation(self.stackhelper.slice.mesh, self.controls, self.camera, self.threed);
+              widget.worldPosition = intersects[0].point;
+              break;
+            case 'Roi':
+              widget =
+                new AMI.default.Widgets.Roi(self.stackhelper.slice.mesh, self.controls, self.camera, self.threed);
+              widget.worldPosition = intersects[0].point;
+              break;
+          }
+
+          self.widgets.push(widget);
+          self.scene.add(widget);
+        });
+
+        this.initbool = true;
+        this.updateMatrix();
+      }
+
+      updateMatrix() {
+        let self = this;
+        const centerLPS = self.stack.worldCenter();
+        this.camera.lookAt(centerLPS.x, centerLPS.y, centerLPS.z);
+        this.controls.target.set(centerLPS.x, centerLPS.y, centerLPS.z);
+        this.camera.updateProjectionMatrix();
+      }
+
+      onWindowResize(evt) {
+        this.camera.aspect = this.threed.clientWidth / this.threed.clientHeight;
+        this.camera.updateProjectionMatrix();
+        this.renderer.setSize(this.threed.clientWidth, this.threed.clientHeight);
+
+        // update offset
+        const box = this.threed.getBoundingClientRect();
+
+        const body = document.body;
+        const docEl = document.documentElement;
+
+        const scrollTop = window.pageYOffset || docEl.scrollTop || body.scrollTop;
+        const scrollLeft = window.pageXOffset || docEl.scrollLeft || body.scrollLeft;
+
+        const clientTop = docEl.clientTop || body.clientTop || 0;
+        const clientLeft = docEl.clientLeft || body.clientLeft || 0;
+
+        const top = box.top + scrollTop - clientTop;
+        const left = box.left + scrollLeft - clientLeft;
+
+        // y: (-((evt.clientY - self.offsets.top + scrollTop) / self.threed.offsetHeight)* 2 + 1)
+        this.offsets = {
+          top: Math.round(top),
+          left: Math.round(left)
+        };
+
+        // repaint all widgets
+        for (let widget of this.widgets) {
+          widget.update();
+        }
+      }
+
+
+      ClearWidgets() {
+        this.widgets = [];
+
+        var i = this.scene.children.length;
+        while (this.scene.children.length > 1) {
+          this.scene.remove(this.scene.children[i]);
+          i--;
+        }
+      }
+
+      RemoveWidgets() {
+        this.widgets = [];
+
+        var i = this.scene.children.length;
+        while (this.scene.children.length > 1) {
+          this.scene.remove(this.scene.children[i]);
+          i--;
+        }
+        this.SaveWidgets(this.index)
+      }
+
+
+      GetWidgets() {
+        return this.widgetsinfo;
+      }
+
+
+      _indexChanged(evt) {
+        // // console.log('index changed ejecutado en AMI Widget');
+        // // console.log ('this in indexChanged: ');
+        // // console.log(this);
+
+        if (!this.initbool) {
+          return;
+        }
+
+        this.ClearWidgets();
+        this.RestoreWidgets();
+      }
+
+
+      SaveWidgets(indexnumber) {
+
+        var jsonwidgets = [];
+
+        for (let i = 0; i < this.scene.children.length; i++) {
+          if (this.scene.children[i].constructor.name === 'WidgetsRuler') {
+            jsonwidgets[i] = this.saveruler(i);
+          }
+          if (this.scene.children[i].constructor.name === 'WidgetsRoi') {
+            jsonwidgets[i] = this.saveroi(i);
+          }
+          if (this.scene.children[i].constructor.name === 'WidgetsHandle') {
+            jsonwidgets[i] = this.savehandle(i);
+          }
+          if (this.scene.children[i].constructor.name === 'WidgetsAnnotation') {
+            jsonwidgets[i] = this.saveannotation(i);
+          }
+          if (this.scene.children[i].constructor.name === 'WidgetsVoxelProbe') {
+            jsonwidgets[i] = this.savevoxelprobe(i);
+          }
+        }
+
+        var key = 'indexnumber' + indexnumber;
+
+        var indexwidgetsinfo = {
+          [key]: jsonwidgets,
+        };
+
+        this.widgetsinfo[key] = jsonwidgets;
+
+        this.dispatchEvent(new CustomEvent('widgetsChanged', { bubbles: true }));
+      }
+
+      saveroi(i) {
+        const constructorname = this.scene.children[i].constructor.name;
+
+        var handles = [];
+
+        for (var n = 0; n < this.scene.children[i]._handles.length; n++) {
+          var infohandles = {};
+
+          var worldPosition = {
+            x: this.scene.children[i]._handles[n]._worldPosition.x,
+            y: this.scene.children[i]._handles[n]._worldPosition.y,
+            z: this.scene.children[i]._handles[n]._worldPosition.z
+          };
+
+          var screenPosition = {
+            x: this.scene.children[i]._handles[n]._screenPosition.x,
+            y: this.scene.children[i]._handles[n]._screenPosition.y,
+            z: this.scene.children[i]._handles[n]._screenPosition.z
+          };
+
+          infohandles['worldPosition'] = worldPosition;
+          infohandles['screenPosition'] = screenPosition;
+
+          handles[n] = infohandles;
+
+        }
+
+        var myObj = {
+          'constructor': constructorname,
+          'length': this.scene.children[i]._handles.length,
+          'position': handles
+        };
+
+        return (myObj);
+      }
+
+      saveruler(i) {
+
+        const ScreenPositionHandle1 = {
+          x: this.scene.children[i]._handles[0]._screenPosition.x,
+          y: this.scene.children[i]._handles[0]._screenPosition.y,
+          z: this.scene.children[i]._handles[0]._screenPosition.z
+        };
+
+        const ScreenPositionHandle2 = {
+          x: this.scene.children[i]._handles[1]._screenPosition.x,
+          y: this.scene.children[i]._handles[1]._screenPosition.y,
+          z: this.scene.children[i]._handles[1]._screenPosition.z
+        };
+
+        const WorldPositionHandle1 = {
+          x: this.scene.children[i]._handles[0]._worldPosition.x,
+          y: this.scene.children[i]._handles[0]._worldPosition.y,
+          z: this.scene.children[i]._handles[0]._worldPosition.z
+        };
+
+        const WorldPositionHandle2 = {
+          x: this.scene.children[i]._handles[1]._worldPosition.x,
+          y: this.scene.children[i]._handles[1]._worldPosition.y,
+          z: this.scene.children[i]._handles[1]._worldPosition.z
+        };
+
+        var mySubObj = {
+          Handle1ScreenPosition: ScreenPositionHandle1,
+          Handle2ScreenPosition: ScreenPositionHandle2,
+          Handle1WorldPosition: WorldPositionHandle1,
+          Handle2WorldPosition: WorldPositionHandle2
+        };
+
+        var myObj = {
+          'constructor': 'WidgetsRuler',
+          'position': mySubObj,
+          'distance': this.scene.children[i]._distance.innerText
+        };
+
+        return (myObj);
+      }
+
+
+      savehandle(i) {
+        const ScreenPositionHandle = {
+          x: this.scene.children[i]._screenPosition.x,
+          y: this.scene.children[i]._screenPosition.y,
+          z: this.scene.children[i]._screenPosition.z
+        }
+
+        const WorldPositionHandle = {
+          x: this.scene.children[i]._worldPosition.x,
+          y: this.scene.children[i]._worldPosition.y,
+          z: this.scene.children[i]._worldPosition.z
+        }
+
+        var mySubObj = {
+          HandleScreenPosition: ScreenPositionHandle,
+          HandleWorldPosition: WorldPositionHandle
+
+        };
+
+        var myObj = {
+          'constructor': 'WidgetsHandle',
+          'position': mySubObj
+        };
+
+        return (myObj);
+      }
+
+      saveannotation(i) {
+
+        const ScreenPositionHandle1 = {
+          x: this.scene.children[i]._handles[0]._screenPosition.x,
+          y: this.scene.children[i]._handles[0]._screenPosition.y,
+          z: this.scene.children[i]._handles[0]._screenPosition.z
+        }
+
+        const ScreenPositionHandle2 = {
+          x: this.scene.children[i]._handles[1]._screenPosition.x,
+          y: this.scene.children[i]._handles[1]._screenPosition.y,
+          z: this.scene.children[i]._handles[1]._screenPosition.z
+        }
+
+        const WorldPositionHandle1 = {
+          x: this.scene.children[i]._handles[0]._worldPosition.x,
+          y: this.scene.children[i]._handles[0]._worldPosition.y,
+          z: this.scene.children[i]._handles[0]._worldPosition.z
+        }
+
+        const WorldPositionHandle2 = {
+          x: this.scene.children[i]._handles[1]._worldPosition.x,
+          y: this.scene.children[i]._handles[1]._worldPosition.y,
+          z: this.scene.children[i]._handles[1]._worldPosition.z
+        }
+
+        var position = {
+          Handle1ScreenPosition: ScreenPositionHandle1,
+          Handle2ScreenPosition: ScreenPositionHandle2,
+          Handle1WorldPosition: WorldPositionHandle1,
+          Handle2WorldPosition: WorldPositionHandle2
+        };
+
+        var labelposition = {
+          x: this.scene.children[i]._labelpositionx,
+          y: this.scene.children[i]._labelpositiony
+        };
+
+        var label = {
+          LabelText: this.scene.children[i]._labeltext,
+          ScreenPosition: labelposition,
+          LabelMoved: this.scene.children[i]._labelmoved
+        };
+
+        var myObj = {
+          'constructor': 'WidgetsAnnotation',
+          'position': position,
+          'label': label
+        };
+
+        return (myObj);
+      }
+
+
+      savevoxelprobe(widgetinfo, i) {
+        const WorldPosition = {
+          x: this.scene.children[i]._worldPosition.x,
+          y: this.scene.children[i]._worldPosition.y,
+          z: this.scene.children[i]._worldPosition.z
+        };
+
+        var myObj = {
+          constructor: 'WidgetsVoxelProbe',
+          WorldPosition: WorldPosition
+        };
+
+        return (myObj);
+      }
+
+      restoreroi(widgetinfo, i) {
+        let self = this;
+
+        let widget = new AMI.default.Widgets.Roi(self.stackhelper.slice.mesh, self.controls, self.camera, self.threed);
+
+        console.table(widget);
+
+        // mesh stuff
+        widget._material = null;
+        widget._geometry = null;
+        widget._mesh = null;
+
+        // dom stuff
+        widget._lines = [];
+        widget._area = null;
+
+        // add handles
+        widget._handles = [];
+
+        widget._active = true;
+
+        for (var n = 0; n < widgetinfo.length; n++) {
+
+          widget._handles[n] = new AMI.default.Widgets.Handle(self.stackhelper.slice.mesh, self.controls, self.camera, self.threed);
+
+          widget._handles[n]._worldPosition = new THREE.Vector3(widgetinfo.position[n].worldPosition.x,
+            widgetinfo.position[n].worldPosition.y,
+            widgetinfo.position[n].worldPosition.z);
+
+          widget.active = false;
+          widget.tracking = false;
+          widget._orientation = self.stackhelper.orientation;
+          widget.active = false;
+
+        }
+
+
+
+        // widget._orientation = self.stackhelper.orientation;
+        // widget._line.style.backgroundColor = '#ff7f24'; //
+        // widget._active = false;
+
+        this.widgets.push(widget);
+        //this.sceneLayerMix.add(widget);
+        this.scene.add(widget);
+      }
+
+
+
+      restoreruler(widgetinfo, i) {
+        // console.log('restore ruler!');
+
+        self = this;
+
+        let widget = new AMI.default.Widgets.Ruler(self.stackhelper.slice.mesh, self.controls, self.camera, self.threed);
+
+        widget.worldPosition = new THREE.Vector3(widgetinfo.position.Handle1WorldPosition.x,
+          widgetinfo.position.Handle1WorldPosition.y,
+          widgetinfo.position.Handle1WorldPosition.z);
+
+        widget._handles[0].worldPosition = new THREE.Vector3(widgetinfo.position.Handle1WorldPosition.x,
+          widgetinfo.position.Handle1WorldPosition.y,
+          widgetinfo.position.Handle1WorldPosition.z);
+
+        widget._handles[1].worldPosition = new THREE.Vector3(widgetinfo.position.Handle2WorldPosition.x,
+          widgetinfo.position.Handle2WorldPosition.y,
+          widgetinfo.position.Handle2WorldPosition.z);
+
+
+        widget._handles[1].active = false;
+        widget._handles[1].tracking = false;
+        widget._handles[0]._dom.classList.add('rulerHandles');
+        widget._handles[1]._dom.classList.add('rulerHandles');
+        widget._orientation = self.stackhelper.orientation;
+        widget._line.style.backgroundColor = '#ff7f24'; //
+        //widget._slice = s;
+        widget.active = false;
+
+        this.widgets.push(widget);
+        //this.sceneLayerMix.add(widget);
+        this.scene.add(widget);
+      }
+
+      restorehandle(widgetinfo, i) {
+        // console.log('restore handle!');
+
+        self = this;
+
+        let widget = new AMI.default.Widgets.Handle(self.stackhelper.slice.mesh, self.controls, self.camera, self.threed);
+
+        widget.worldPosition = new THREE.Vector3(widgetinfo.position.HandleWorldPosition.x,
+          widgetinfo.position.HandleWorldPosition.y,
+          widgetinfo.position.HandleWorldPosition.z);
+
+        widget.active = false;
+        widget.tracking = false;
+        widget._orientation = self.stackhelper.orientation;
+        widget.active = false;
+
+        this.widgets.push(widget);
+        this.scene.add(widget);
+      }
+
+      restoreannotation(widgetinfo, i) {
+        // console.log('restore annotation!');
+
+        self = this;
+
+        let widget = new AMI.default.Widgets.Annotation(self.stackhelper.slice.mesh, self.controls, self.camera, self.threed);
+
+
+        widget.worldPosition = new THREE.Vector3(widgetinfo.position.Handle1WorldPosition.x,
+          widgetinfo.position.Handle1WorldPosition.y,
+          widgetinfo.position.Handle1WorldPosition.z);
+
+        widget._handles[0].worldPosition = new THREE.Vector3(widgetinfo.position.Handle1WorldPosition.x,
+          widgetinfo.position.Handle1WorldPosition.y,
+          widgetinfo.position.Handle1WorldPosition.z);
+
+        widget._handles[1].worldPosition = new THREE.Vector3(widgetinfo.position.Handle2WorldPosition.x,
+          widgetinfo.position.Handle2WorldPosition.y,
+          widgetinfo.position.Handle2WorldPosition.z);
+
+        if (widgetinfo.label.LabelText !== null) {
+          if (widgetinfo.label.LabelText.length > 0) {
+
+            widget._manuallabeldisplay = true;
+
+            widget._labelmoved = widgetinfo.label.LabelMoved;
+
+            widget._labeltext = widgetinfo.label.LabelText;
+
+            widget._labelpositionx = widgetinfo.label.ScreenPosition.x;
+            widget._labelpositiony = widgetinfo.label.ScreenPosition.y;
+
+            widget._alreadycreated = true;
+          }
+        }
+
+
+        widget._dragged = false;
+        widget._hovered = true;
+
+        widget._handles[1].active = false;
+        widget._handles[1].tracking = false;
+        // widget._handles[0]._dom.classList.add('rulerHandles');
+        // widget._handles[1]._dom.classList.add('rulerHandles');
+        widget._orientation = this.stackhelper.orientation;
+        widget._line.style.backgroundColor = '#ff7f24'; //
+        //widget._slice = s;
+        widget.active = false;
+
+        this.widgets.push(widget);
+        //this.sceneLayerMix.add(widget);
+        this.scene.add(widget);
+      }
+
+
+      restorevoxelprobe(widgetinfo, i) {
+        // console.log('restore voxelprobe!');
+
+        self = this;
+
+        let widget = new AMI.default.Widgets.VoxelProbe(self.stack, self.stackhelper.slice.mesh, self.controls, self.camera, self.threed);
+
+        widget.worldPosition = new THREE.Vector3(widgetinfo.WorldPosition.x,
+          widgetinfo.WorldPosition.y,
+          widgetinfo.WorldPosition.z);
+
+        widget.active = false;
+        widget.tracking = false;
+        widget._orientation = self.stackhelper.orientation;
+        widget.active = false;
+
+        this.widgets.push(widget);
+        this.scene.add(widget);
+      }
+
+
+      RestoreWidgets() {
+
+        // const key = 'indexnumber' + this.index;
+        // // console.log('key='+key)
+
+        // // console.log('restore widgets! con this.widgetsinfo =');
+        // // console.log(this.widgetsinfo['indexnumber' + this.index]);
+
+        const indexwindgetsinfo = this.widgetsinfo['indexnumber' + this.index];
+
+        // // console.log('indexwindgetsinfo[1].constructor=' + indexwindgetsinfo[1].constructor);
+
+        // // console.log('indexwindgetsinfo.length=' + indexwindgetsinfo.length)
+
+        if (indexwindgetsinfo !== undefined) {
+          //for (let i = 1; i < indexwindgetsinfo.length; i++) { 
+          var i = 1;
+          while (indexwindgetsinfo[i] !== undefined) {
+            if (indexwindgetsinfo[i].constructor == 'WidgetsRuler') {
+              this.restoreruler(indexwindgetsinfo[i], i);
+            }
+            if (indexwindgetsinfo[i].constructor == 'WidgetsRoi') {
+              this.restoreroi(indexwindgetsinfo[i], i);
+            }
+            if (indexwindgetsinfo[i].constructor == 'WidgetsHandle') {
+              this.restorehandle(indexwindgetsinfo[i], i);
+            }
+            if (indexwindgetsinfo[i].constructor == 'WidgetsAnnotation') {
+              this.restoreannotation(indexwindgetsinfo[i], i);
+            }
+            if (indexwindgetsinfo[i].constructor == 'WidgetsVoxelProbe') {
+              this.restorevoxelprobe(indexwindgetsinfo[i], i);
+            }
+            i++;
+          }
+        }
+
+      }
+
+
+      clearScene() {
+        //this.scene = new THREE.Scene();
+        // console.log('this.scene.children=' + this.scene.children);
+        console.table(this.scene.children);
+      }
+
+
+      RoiToBidirectionalRuler() {
+        // console.log('RoiToBidirectionalRuler has been called')
+        const indexwindgetsinfo = this.widgetsinfo['indexnumber' + this.index];
+        if (indexwindgetsinfo !== undefined) {
+          //for (let i = 1; i < indexwindgetsinfo.length; i++) { 
+          var n = 1;
+          while (indexwindgetsinfo[n] !== undefined) {
+            if (indexwindgetsinfo[n].constructor == 'WidgetsRoi') {
+              //this.restoreroi(indexwindgetsinfo[i], i);
+              console.table(indexwindgetsinfo);
+              // console.log('voy a evaluar el length')
+
+              if (indexwindgetsinfo[n].length < 4) {
+                // console.log('The Roi doesnt have enough handles to create a biruler (less than 4)');
+                return
+              }
+
+
+
+              const handleslength = indexwindgetsinfo[n].length;
+
+              var longestHandle1number = null;
+              var longestHandle2number = null;
+              var longestDistance = 0;
+              var distanceEvaluation = 0;
+
+              var j = 1
+              for (var i = 1; i < handleslength; i++) { //loop optimized to find the longest axis without repeating the same operations
+                for (var k = 1; k < j; k++) {
+                  // console.log ('evaluamos ' + i + ' con ' + k);
+                  distanceEvaluation =
+                    Math.sqrt(Math.pow(indexwindgetsinfo[n].position[k].worldPosition.x - indexwindgetsinfo[n].position[i].worldPosition.x, 2)
+                      + Math.pow(indexwindgetsinfo[n].position[k].worldPosition.y - indexwindgetsinfo[n].position[i].worldPosition.y, 2)
+                      + Math.pow(indexwindgetsinfo[n].position[k].worldPosition.z - indexwindgetsinfo[n].position[i].worldPosition.z, 2));
+                  // console.log (distanceEvaluation);
+                  if (distanceEvaluation > longestDistance) {
+                    longestDistance = distanceEvaluation;
+                    longestHandle1number = i;
+                    longestHandle2number = k;
+                  }
+                }
+                j++;
+              }
+
+              // console.log(longestDistance);
+              // console.log(longestHandle1number);
+              // console.log(longestHandle2number);
+
+              this.createRuler(indexwindgetsinfo[n], longestHandle1number, longestHandle2number);
+
+
+
+              //get shortest axis
+              const coeficient = 0.1; //should be between 0 and 1 
+
+              const longestHandle1numberMin = Math.min(longestHandle1number, longestHandle2number);
+              const longestHandle1numberMax = Math.max(longestHandle1number, longestHandle2number);
+
+              // console.log(longestHandle1numberMin);
+              // console.log(longestHandle1numberMax);
+
+              const centerFirstRange = (longestHandle1numberMin + longestHandle1numberMax) / 2;
+              const centerSecondRange = (longestHandle1numberMax + handleslength) / 2;
+
+              const centerFirstRangeFloor = Math.floor(centerFirstRange - ((longestHandle1numberMax - longestHandle1numberMin) * coeficient) / 2);
+              const centerFirstRangeTop = Math.floor(centerFirstRange + ((longestHandle1numberMax - longestHandle1numberMin) * coeficient) / 2);
+
+              const centerSecondRangeFloor = Math.floor(centerSecondRange - ((handleslength - longestHandle1numberMax) * coeficient) / 2);
+              const centerSecondRangeTop = Math.floor(centerSecondRange + ((handleslength - longestHandle1numberMax) * coeficient) / 2);
+
+              // console.log('rango inferior y superior 1 = ' + centerFirstRangeFloor + ' y ' + centerFirstRangeTop);
+              // console.log('rango inferior y superior 2 = ' + centerSecondRangeFloor + ' y ' + centerSecondRangeTop);
+              // console.log('length= ' + handleslength);
+
+              var shortestHandle1number = null;
+              var shortestHandle2number = null;
+              var shortestDistance = null;
+
+              for (var i = centerFirstRangeFloor; i <= centerFirstRangeTop; i++) { //loop optimized to find the longest axis without repeating the same operations
+                for (var k = centerSecondRangeFloor; k <= centerSecondRangeTop; k++) {
+                  // console.log ('evaluamos ' + i + ' con ' + k);
+                  distanceEvaluation =
+                    Math.sqrt(Math.pow(indexwindgetsinfo[n].position[k].worldPosition.x - indexwindgetsinfo[n].position[i].worldPosition.x, 2)
+                      + Math.pow(indexwindgetsinfo[n].position[k].worldPosition.y - indexwindgetsinfo[n].position[i].worldPosition.y, 2)
+                      + Math.pow(indexwindgetsinfo[n].position[k].worldPosition.z - indexwindgetsinfo[n].position[i].worldPosition.z, 2));
+                  // console.log (distanceEvaluation);
+                  if (distanceEvaluation < shortestDistance || shortestDistance == null) {
+                    shortestDistance = distanceEvaluation;
+                    shortestHandle1number = i;
+                    shortestHandle2number = k;
+                  }
+                }
+              }
+
+              // console.log(shortestDistance);
+              // console.log(shortestHandle1number);
+              // console.log(shortestHandle2number);
+
+
+              this.createRuler(indexwindgetsinfo[n], shortestHandle1number, shortestHandle2number);
+
+
+
+              i++;
+            }
+            n++;
+          }
+        }
+        this.SaveWidgets(this.index);
+      }
+
+
+      createRuler(indexwindgetsinfo, handle1number, handle2number) {
+        self = this;
+
+        let widget = new AMI.default.Widgets.Ruler(self.stackhelper.slice.mesh, self.controls, self.camera, self.threed);
+
+        widget.worldPosition = new THREE.Vector3(indexwindgetsinfo.position[handle1number].worldPosition.x,
+          indexwindgetsinfo.position[handle1number].worldPosition.y,
+          indexwindgetsinfo.position[handle1number].worldPosition.z);
+
+        widget._handles[0].worldPosition = new THREE.Vector3(indexwindgetsinfo.position[handle1number].worldPosition.x,
+          indexwindgetsinfo.position[handle1number].worldPosition.y,
+          indexwindgetsinfo.position[handle1number].worldPosition.z);
+
+        widget._handles[1].worldPosition = new THREE.Vector3(indexwindgetsinfo.position[handle2number].worldPosition.x,
+          indexwindgetsinfo.position[handle2number].worldPosition.y,
+          indexwindgetsinfo.position[handle2number].worldPosition.z);
+
+
+        widget._handles[1].active = false;
+        widget._handles[1].tracking = false;
+        widget._handles[0]._dom.classList.add('rulerHandles');
+        widget._handles[1]._dom.classList.add('rulerHandles');
+        widget._orientation = self.stackhelper.orientation;
+        widget._line.style.backgroundColor = '#ff7f24'; //
+        //widget._slice = s;
+        widget.active = false;
+
+        this.widgets.push(widget);
+        //this.sceneLayerMix.add(widget);
+        this.scene.add(widget);
+
+      }
+
+
+      fakerestoreroi(widgetinfo, i) {
+        // console.log('restore roi!');
+
+        self = this;
+
+        let widget = new AMI.default.Widgets.Roi(self.stackhelper.slice.mesh, self.controls, self.camera, self.threed);
+
+        for (var n = 0; n < widgetinfo.length; n++) {
+
+          widget._handles[n] = new AMI.default.Widgets.Handle(self.stackhelper.slice.mesh, self.controls, self.camera, self.threed);
+
+          widget._handles[n]._worldPosition = new THREE.Vector3(widgetinfo.position[n].worldPosition.x,
+            widgetinfo.position[n].worldPosition.y,
+            widgetinfo.position[n].worldPosition.z);
+
+          widget.active = false;
+          widget.tracking = false;
+          widget._orientation = self.stackhelper.orientation;
+          widget.active = false;
+
+        }
+
+        this.widgets.push(widget);
+        //this.sceneLayerMix.add(widget);
+        this.scene.add(widget);
+      }
+
+    };
+
+
+
+    customElements.define(AmiWidget2.is, AmiWidget2);
+
+
+  </script>
+</dom-module>
