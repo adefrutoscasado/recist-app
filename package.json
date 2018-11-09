@@ -6,6 +6,10 @@
     "start": "node ./bin/www",
     "nodemon": "node_modules/nodemon/bin/nodemon.js ./bin/www"
   },
+  "engines": {
+    "node": "7.10.0",
+    "npm": "4.2.0"
+  },
   "dependencies": {
     "cookie-parser": "~1.4.3",
     "debug": "~2.6.9",
