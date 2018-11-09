@@ -1,14 +1,14 @@
-<link rel="import" href="/bower_components/polymer/polymer.html">
-<link rel="import" href="/bower_components/polymer/polymer-element.html">
-<link rel="import" href="/bower_components/ami-import/ami-import.html">
+<link rel="import" href="/bower_components/polymer/polymer.html" />
+<link rel="import" href="/bower_components/polymer/polymer-element.html" />
+<link rel="import" href="/bower_components/ami-import/ami-import.html" />
 
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js"></script>
 <script src="https://code.jquery.com/ui/1.9.2/jquery-ui.js"></script>
 
 <!--
-AMI Viewer element!
-`ami-viewer` takes an array of data organized by series/stacks/frames (provided by the [ami-loader](http://fnndsc.github.io/ami-loader) and displays it.
-@demo demo/index.html
+  AMI Viewer element!
+  `ami-viewer` takes an array of data organized by series/stacks/frames (provided by the [ami-loader](http://fnndsc.github.io/ami-loader) and displays it.
+  @demo demo/index.html
 -->
 
 <dom-module id="ami-viewer2">
@@ -47,7 +47,7 @@ AMI Viewer element!
       }
 
       .sk-fading-circle .sk-circle:before {
-        content: '';
+        content: "";
         display: block;
         margin: 0 auto;
         width: 15%;
@@ -180,26 +180,22 @@ AMI Viewer element!
       }
 
       @-webkit-keyframes sk-circleFadeDelay {
-
         0%,
         39%,
         100% {
           opacity: 0;
         }
-
         40% {
           opacity: 1;
         }
       }
 
       @keyframes sk-circleFadeDelay {
-
         0%,
         39%,
         100% {
           opacity: 0;
         }
-
         40% {
           opacity: 1;
         }
@@ -222,22 +218,20 @@ AMI Viewer element!
         <div class="sk-circle12 sk-circle"></div>
       </div>
     </div>
-
   </template>
 
   <script>
-
     class AmiViewer2 extends Polymer.Element {
-
-      static get is() { return 'ami-viewer2'; }
+      static get is() {
+        return "ami-viewer2";
+      }
 
       static get properties() {
         return {
-
           series: {
             type: Array,
             value: [],
-            observer: '_seriesChanged'
+            observer: "_seriesChanged"
           },
 
           stack: {
@@ -288,15 +282,15 @@ AMI Viewer element!
 
           orientation: {
             type: String,
-            value: 'default',
-            observer: '_orientationChanged'
+            value: "default",
+            observer: "_orientationChanged"
           },
 
           index: {
             type: Number,
             value: 0,
             notify: true,
-            observer: '_indexChanged'
+            observer: "_indexChanged"
           },
 
           indexMax: {
@@ -308,26 +302,26 @@ AMI Viewer element!
           flipRows: {
             type: Boolean,
             value: false,
-            observer: '_flipRowsChanged'
+            observer: "_flipRowsChanged"
           },
 
           flipColumns: {
             type: Boolean,
             value: false,
-            observer: '_flipColumnsChanged'
+            observer: "_flipColumnsChanged"
           },
 
           borderColor: {
             type: String,
-            value: '#FF9800',
-            observer: '_borderColorChanged'
+            value: "#FF9800",
+            observer: "_borderColorChanged"
           },
 
           angle: {
             type: Number,
             value: 0,
             notify: true,
-            observer: '_angleChanged'
+            observer: "_angleChanged"
           },
 
           threed: {
@@ -339,17 +333,13 @@ AMI Viewer element!
           loading: {
             type: Boolean,
             value: false,
-            observer: '_loadingChanged'
+            observer: "_loadingChanged"
           }
         };
       }
 
-
       _seriesChanged() {
-        console.log('AMI-viewer _seriesChanged');
-
         if (!this.series || this.series.length <= 0) {
-          console.log('AMI-viewer _seriesChanged: not valid series');
           return;
         }
 
@@ -363,7 +353,7 @@ AMI Viewer element!
         // create helper!
         this.stack = this.series[0].stack[0];
 
-        this.set('stack', this.stack);
+        this.set("stack", this.stack);
 
         this.stackhelper = new AMI.default.Helpers.Stack(this.stack);
 
@@ -380,23 +370,9 @@ AMI Viewer element!
         this._setupIndex();
 
         // add mouse wheel event listener
-        var myitem = this.$.container;
+        var myItem = this.$.container;
 
-        myitem.addEventListener('mousewheel', e => this.MouseWheelHandler(e));
-
-        // if (myitem.addEventListener)
-        // {
-        //     // IE9, Chrome, Safari, Opera
-        //     //myitem.addEventListener("mousewheel", MouseWheelHandler, false);
-        //     myitem.addEventListener('mousewheel', e => MouseWheelHandler(e));
-        //     // Firefox
-        //     myitem.addEventListener("DOMMouseScroll", MouseWheelHandler, false);
-        // }
-        // // IE 6/7/8
-        // else
-        // {
-        //     myitem.attachEvent("onmousewheel", MouseWheelHandler);
-        // }
+        myItem.addEventListener("mousewheel", e => this.MouseWheelHandler(e));
 
         // flips
         if (this.flipRows) {
@@ -411,13 +387,15 @@ AMI Viewer element!
       MouseWheelHandler(e) {
         // cross-browser wheel delta
         e = window.event || e; // old IE support
-        var delta = Math.max(-1, Math.min(1, (e.wheelDelta || -e.detail)));
+        var delta = Math.max(-1, Math.min(1, e.wheelDelta || -e.detail));
 
         var newindex = this.stackhelper.index + delta;
 
-        if (newindex < 0) { // apply that min value = 1
+        if (newindex < 0) {
+          // apply that min value = 1
           this.index = 0;
-        } else if (newindex > this.stackhelper._stack._numberOfFrames - 1) { // apply that max value = numberofframes
+        } else if (newindex > this.stackhelper._stack._numberOfFrames - 1) {
+          // apply that max value = numberofframes
           this.index = this.stackhelper._stack._numberOfFrames - 1;
         } else {
           this.ClearDOMWidgets();
@@ -426,13 +404,14 @@ AMI Viewer element!
       }
 
       _init() {
-        console.log('AMI-VIEWER2 init');
-
         // init the renderer
         this.renderer = new THREE.WebGLRenderer({
           antialias: true
         });
-        this.renderer.setSize(this.$.container.offsetWidth, this.$.container.offsetHeight);
+        this.renderer.setSize(
+          this.$.container.offsetWidth,
+          this.$.container.offsetHeight
+        );
         this.renderer.setClearColor(0x353535, 1);
         this.renderer.setPixelRatio(window.devicePixelRatio);
         this.$.container.appendChild(this.renderer.domElement);
@@ -441,20 +420,29 @@ AMI Viewer element!
         this.scene = new THREE.Scene();
 
         // init the camera
-        this.camera = new AMI.default.Cameras.Orthographic(this.$.container.clientWidth / -2, this.$.container.clientWidth / 2, this.$.container.clientHeight / 2, this.$.container.clientHeight / -2, 0.1, 10000);
+        this.camera = new AMI.default.Cameras.Orthographic(
+          this.$.container.clientWidth / -2,
+          this.$.container.clientWidth / 2,
+          this.$.container.clientHeight / 2,
+          this.$.container.clientHeight / -2,
+          0.1,
+          10000
+        );
 
-
-        this.set('threed', this.$.container);
+        this.set("threed", this.$.container);
 
         // init the controls
-        this.controls = new AMI.default.Controls.TrackballOrtho(this.camera, this.$.container);
+        this.controls = new AMI.default.Controls.TrackballOrtho(
+          this.camera,
+          this.$.container
+        );
         this.controls.staticMoving = true;
         this.controls.noRotate = true;
         this.camera.controls = this.controls;
 
         // event listeners
         this._onWindowResize = this._onWindowResize.bind(this);
-        window.addEventListener('resize', this._onWindowResize, false);
+        window.addEventListener("resize", this._onWindowResize, false);
 
         this.index = 0;
 
@@ -462,13 +450,13 @@ AMI Viewer element!
 
         this.threed = this.$.container;
 
-        console.log('AMI-VIEWER2 init Finished');
-
         this.animate();
       }
 
       animate() {
-        this.animationFrameID = window.requestAnimationFrame(this.animate.bind(this));
+        this.animationFrameID = window.requestAnimationFrame(
+          this.animate.bind(this)
+        );
 
         this.controls.update();
         this.renderer.render(this.scene, this.camera);
@@ -482,18 +470,25 @@ AMI Viewer element!
 
         this.camera.fitBox(2);
 
-        this.renderer.setSize(this.$.container.clientWidth, this.$.container.clientHeight);
+        this.renderer.setSize(
+          this.$.container.clientWidth,
+          this.$.container.clientHeight
+        );
       }
 
       _orientationChanged() {
-        if (!(this.orientation === 'free' ||
-          this.orientation === 'default' ||
-          this.orientation === 'axial' ||
-          this.orientation === 'coronal' ||
-          this.orientation === 'sagittal')) {
-          window.console.warn('invalid orientation: ' + this.orientation);
+        if (
+          !(
+            this.orientation === "free" ||
+            this.orientation === "default" ||
+            this.orientation === "axial" ||
+            this.orientation === "coronal" ||
+            this.orientation === "sagittal"
+          )
+        ) {
+          window.console.warn("invalid orientation: " + this.orientation);
           window.console.warn('setting orientation to "default"');
-          this.orientation = 'default';
+          this.orientation = "default";
         }
 
         if (!this.stackhelper) {
@@ -521,7 +516,6 @@ AMI Viewer element!
             max = dimensionsIJK.y - 1;
             break;
           default:
-            // do nothing!
             break;
         }
 
@@ -540,7 +534,11 @@ AMI Viewer element!
         // box: {halfDimensions, center}
         var box = {
           center: this.stack.worldCenter().clone(),
-          halfDimensions: new THREE.Vector3(lpsDims.x + 10, lpsDims.y + 10, lpsDims.z + 10)
+          halfDimensions: new THREE.Vector3(
+            lpsDims.x + 10,
+            lpsDims.y + 10,
+            lpsDims.z + 10
+          )
         };
 
         // init and zoom
@@ -549,7 +547,11 @@ AMI Viewer element!
           height: this.$.container.clientHeight
         };
 
-        this.camera.directions = [this.stack.xCosine, this.stack.yCosine, this.stack.zCosine];
+        this.camera.directions = [
+          this.stack.xCosine,
+          this.stack.yCosine,
+          this.stack.zCosine
+        ];
         this.camera.orientation = this.orientation;
         this.camera.box = box;
         this.camera.canvas = canvas;
@@ -563,7 +565,6 @@ AMI Viewer element!
           return;
         }
         this.stackhelper.index = this.index;
-        console.log('indexChanged finished');
       }
 
       _flipRowsChanged() {
@@ -598,24 +599,25 @@ AMI Viewer element!
       }
 
       _loadingChanged() {
-        let self = this
-        let loadingCircle = Polymer.dom(this.root).querySelector('#loading-circle');
+        let self = this;
+        let loadingCircle = Polymer.dom(this.root).querySelector(
+          "#loading-circle"
+        );
         if (this.loading) {
-          $(loadingCircle).show()
+          $(loadingCircle).show();
         } else {
-          $(loadingCircle).hide()
+          $(loadingCircle).hide();
         }
       }
 
       ClearDOMWidgets() {
-        var widgetDiv = Polymer.dom(this.root).querySelectorAll('.widgets');
+        var widgetDiv = Polymer.dom(this.root).querySelectorAll(".widgets");
         $(widgetDiv).remove();
-        var widgetDiv = Polymer.dom(this.root).querySelectorAll('.Widget');
+        var widgetDiv = Polymer.dom(this.root).querySelectorAll(".Widget");
         $(widgetDiv).remove();
       }
     }
 
     customElements.define(AmiViewer2.is, AmiViewer2);
-
   </script>
 </dom-module>
