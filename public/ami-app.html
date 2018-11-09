@@ -321,7 +321,7 @@
 
             <div id='divdropzone' class='dropzone'>
               <ami-viewer2 id='amiviewer' series='{{series}}' stackhelper={{stackhelper}} stack={{stack}} controls={{controls}}
-                camera={{camera}} threed={{threed}} scene={{scene}} renderer={{renderer}} index={{index}}>
+                camera={{camera}} threed={{threed}} scene={{scene}} renderer={{renderer}} index={{index}} loading=[[loading]]>
               </ami-viewer2>
               <ami-widget2 id='amiwidget' stackhelper={{stackhelper}} stack={{stack}} controls=[[controls]] camera=[[camera]]
                 threed={{threed}} scene={{scene}} renderer={{renderer}} guiobjects={{guiobjects}} index={{index}}>
@@ -584,7 +584,7 @@
 
             <div id='divdropzone2' class='dropzone'>
               <ami-viewer2 id='amiviewer2' series='{{series2}}' stackhelper={{stackhelper2}} stack={{stack2}} controls={{controls2}}
-                camera={{camera2}} threed={{threed2}} scene={{scene2}} renderer={{renderer2}} index={{index2}}>
+                camera={{camera2}} threed={{threed2}} scene={{scene2}} renderer={{renderer2}} index={{index2}} loading=[[loading2]]>
               </ami-viewer2>
               <ami-widget2 id='amiwidget2' stackhelper={{stackhelper2}} stack={{stack2}} controls=[[controls2]] camera=[[camera2]]
                 threed={{threed2}} scene={{scene2}} renderer={{renderer2}} guiobjects={{guiobjects2}} index={{index2}}>
@@ -694,26 +694,31 @@
         }.bind(this));
 
         Polymer.dom(this.root).querySelector('#amiloader').addEventListener('loaded', function (e) {
+          Polymer.dom(this.root).querySelector('#amiviewer').loading = false
           Polymer.dom(this.root).querySelector('#amiwidget').init();
         }.bind(this));
 
         Polymer.dom(this.root).querySelector('#amiloader2').addEventListener('loaded', function (e) {
+          Polymer.dom(this.root).querySelector('#amiviewer2').loading = false
           Polymer.dom(this.root).querySelector('#amiwidget2').init();
         }.bind(this));
       }
 
 
       LoadUrls() {
+        Polymer.dom(this.root).querySelector('#amiviewer').loading = true
         const inputurls = Polymer.dom(this.root).querySelector('#inputurls').value;
         Polymer.dom(this.root).querySelector('#amiloader').urls = inputurls.split('\n');
       }
 
       LoadUrls2() {
+        Polymer.dom(this.root).querySelector('#amiviewer2').loading = true
         const inputurls2 = Polymer.dom(this.root).querySelector('#inputurls2').value;
         Polymer.dom(this.root).querySelector('#amiloader2').urls = inputurls2.split('\n');
       }
 
       attachFiles(evt) {
+        Polymer.dom(this.root).querySelector('#amiviewer').loading = true
         // convert files object to array
         var files = [];
         for (var i = 0; i < evt.target.files.length; i++) {
@@ -723,6 +728,7 @@
       }
 
       attachFiles2(evt) {
+        Polymer.dom(this.root).querySelector('#amiviewer2').loading = true
         // convert files object to array
         var files = [];
         for (var i = 0; i < evt.target.files.length; i++) {
