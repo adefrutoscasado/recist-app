@@ -49,7 +49,6 @@
                     font-weight: normal;
                     font-style: normal;
                     font-size: 24px;
-                    /* Preferred icon size */
                     display: inline-block;
                     line-height: 1;
                     text-transform: none;
@@ -57,13 +56,9 @@
                     word-wrap: normal;
                     white-space: nowrap;
                     direction: ltr;
-                    /* Support for all WebKit browsers. */
                     -webkit-font-smoothing: antialiased;
-                    /* Support for Safari and Chrome. */
                     text-rendering: optimizeLegibility;
-                    /* Support for Firefox. */
                     -moz-osx-font-smoothing: grayscale;
-                    /* Support for IE. */
                     font-feature-settings: 'liga';
                 }
             </style>
@@ -314,7 +309,7 @@
                 sample-data/dicom/adi_brain/36749656
               </textarea>
               &nbsp;&nbsp;
-              <button on-tap='LoadUrls'>Load</button>
+              <button on-tap='loadUrls'>Load</button>
             </paper-button>
 
             <ami-loader2 id='amiloader' files='[[files]]' urls='[[urls]]' series='{{series}}'></ami-loader2>
@@ -328,7 +323,7 @@
               </ami-widget2>
             </div>
 
-            <paper-button raised id='ClearWidgets1' class='widgetbutton' on-tap='ClearWidgets1'><i class='material-icons'>clear</i>&nbsp;&nbsp;Reset
+            <paper-button raised id='clearWidgets1' class='widgetbutton' on-tap='clearWidgets1'><i class='material-icons'>clear</i>&nbsp;&nbsp;Reset
               Widgets
             </paper-button>
 
@@ -577,7 +572,7 @@
                 sample-data/dicom/adi_brain/36749656
               </textarea>
               &nbsp;&nbsp;
-              <button on-tap='LoadUrls2'>Load</button>
+              <button on-tap='loadUrls2'>Load</button>
             </paper-button>
 
             <ami-loader2 id='amiloader2' files='[[files2]]' urls='[[urls2]]' series='{{series2}}'></ami-loader2>
@@ -591,28 +586,28 @@
               </ami-widget2>
             </div>
 
-            <paper-button raised id='ClearWidgets2' class='widgetbutton' on-tap='ClearWidgets2'><i class='material-icons'>clear</i>&nbsp;&nbsp;Reset
+            <paper-button raised id='clearWidgets2' class='widgetbutton' on-tap='clearWidgets2'><i class='material-icons'>clear</i>&nbsp;&nbsp;Reset
               Widgets
             </paper-button>
 
           </th>
 
           <th>
-            <paper-button raised id='ButtonWidgetHandle' class='widgetbutton' on-tap='ActivateWidgetHandle'><i class='material-icons'>radio_button_checked</i>&nbsp;&nbsp;Handle</paper-button>
+            <paper-button raised id='ButtonWidgetHandle' class='widgetbutton' on-tap='activateWidgetHandle'><i class='material-icons'>radio_button_checked</i>&nbsp;&nbsp;Handle</paper-button>
             <br />
             <br />
-            <paper-button raised id='ButtonWidgetRuler' class='widgetbutton' on-tap='ActivateWidgetRuler'><i class='material-icons'>straighten</i>&nbsp;&nbsp;Ruler</paper-button>
+            <paper-button raised id='ButtonWidgetRuler' class='widgetbutton' on-tap='activateWidgetRuler'><i class='material-icons'>straighten</i>&nbsp;&nbsp;Ruler</paper-button>
             <br />
             <br />
-            <!-- <paper-button raised id='ButtonWidgetVoxelProbe' class='widgetbutton' on-tap='ActivateWidgetVoxelProbe'>VoxelProbe</paper-button> -->
-            <paper-button raised id='ButtonWidgetAnnotation' class='widgetbutton' on-tap='ActivateWidgetAnnotation'><i
+            <!-- <paper-button raised id='ButtonWidgetVoxelProbe' class='widgetbutton' on-tap='activateWidgetVoxelProbe'>VoxelProbe</paper-button> -->
+            <paper-button raised id='ButtonWidgetAnnotation' class='widgetbutton' on-tap='activateWidgetAnnotation'><i
                 class='material-icons'>call_made</i>&nbsp;&nbsp;Annotation</paper-button>
             <br />
             <br />
-            <paper-button raised id='ButtonWidgetRoi' class='widgetbutton' on-tap='ActivateWidgetRoi'><i class='material-icons'>panorama_fish_eye</i>&nbsp;&nbsp;Roi</paper-button>
+            <paper-button raised id='ButtonWidgetRoi' class='widgetbutton' on-tap='activateWidgetRoi'><i class='material-icons'>panorama_fish_eye</i>&nbsp;&nbsp;Roi</paper-button>
             <br />
             <br />
-            <paper-button raised id='ButtonMove' class='widgetbutton' on-tap='ActivateMove'><i class='material-icons'>pan_tool</i>&nbsp;&nbsp;Move</paper-button>
+            <paper-button raised id='ButtonMove' class='widgetbutton' on-tap='activateMove'><i class='material-icons'>pan_tool</i>&nbsp;&nbsp;Move</paper-button>
           </th>
 
         </tr>
@@ -648,7 +643,7 @@
 
       <div style='width:840px'>
         <center>
-          <paper-button raised id='Evaluate' class='widgetbutton' on-tap='evaluateGrowth'><i class='material-icons'>assignment</i>&nbsp;&nbsp;<strong>Evaluate</strong></paper-button><strong></strong>
+          <paper-button raised id='evaluate' class='widgetbutton' on-tap='evaluateGrowth'><i class='material-icons'>assignment</i>&nbsp;&nbsp;<strong>evaluate</strong></paper-button><strong></strong>
           <br />
           <br />
           <table border='1' style='width:30%' id='progresion'>
@@ -686,11 +681,11 @@
         Polymer.dom(this.root).querySelector('#input2').addEventListener('change', this.attachFiles2.bind(this), false);
 
         Polymer.dom(this.root).querySelector('#amiwidget').addEventListener('widgetsChanged', function (e) {
-          this.Evaluate();
+          this.evaluate();
         }.bind(this));
 
         Polymer.dom(this.root).querySelector('#amiwidget2').addEventListener('widgetsChanged', function (e) {
-          this.Evaluate();
+          this.evaluate();
         }.bind(this));
 
         Polymer.dom(this.root).querySelector('#amiloader').addEventListener('loaded', function (e) {
@@ -705,13 +700,13 @@
       }
 
 
-      LoadUrls() {
+      loadUrls() {
         Polymer.dom(this.root).querySelector('#amiviewer').loading = true
         const inputurls = Polymer.dom(this.root).querySelector('#inputurls').value;
         Polymer.dom(this.root).querySelector('#amiloader').urls = inputurls.split('\n');
       }
 
-      LoadUrls2() {
+      loadUrls2() {
         Polymer.dom(this.root).querySelector('#amiviewer2').loading = true
         const inputurls2 = Polymer.dom(this.root).querySelector('#inputurls2').value;
         Polymer.dom(this.root).querySelector('#amiloader2').urls = inputurls2.split('\n');
@@ -720,8 +715,8 @@
       attachFiles(evt) {
         Polymer.dom(this.root).querySelector('#amiviewer').loading = true
         // convert files object to array
-        var files = [];
-        for (var i = 0; i < evt.target.files.length; i++) {
+        let files = [];
+        for (let i = 0; i < evt.target.files.length; i++) {
           files.push(evt.target.files[i]);
         }
         Polymer.dom(this.root).querySelector('#amiloader').files = files;
@@ -730,92 +725,92 @@
       attachFiles2(evt) {
         Polymer.dom(this.root).querySelector('#amiviewer2').loading = true
         // convert files object to array
-        var files = [];
-        for (var i = 0; i < evt.target.files.length; i++) {
+        let files = [];
+        for (let i = 0; i < evt.target.files.length; i++) {
           files.push(evt.target.files[i]);
         }
         Polymer.dom(this.root).querySelector('#amiloader2').files = files;
       }
 
 
-      restartbackgroundbuttons(classname) {
-        var elements = Polymer.dom(this.root).querySelectorAll('.' + classname);
-        for (var i = 0; i < elements.length; i++) {
+      restartBackgroundButtons(classname) {
+        let elements = Polymer.dom(this.root).querySelectorAll('.' + classname);
+        for (let i = 0; i < elements.length; i++) {
           elements[i].style.backgroundColor = 'initial';
         }
       }
 
-      ActivateWidgetHandle() {
-        this.restartbackgroundbuttons('widgetbutton');
+      activateWidgetHandle() {
+        this.restartBackgroundButtons('widgetbutton');
         Polymer.dom(this.root).querySelector('#ButtonWidgetHandle').style.background = '#81D4FA';
         Polymer.dom(this.root).querySelector('#amiwidget').guiobjects = { type: 'Handle' };
         Polymer.dom(this.root).querySelector('#amiwidget2').guiobjects = { type: 'Handle' };
       }
 
-      ActivateWidgetRuler() {
-        this.restartbackgroundbuttons('widgetbutton');
+      activateWidgetRuler() {
+        this.restartBackgroundButtons('widgetbutton');
         Polymer.dom(this.root).querySelector('#ButtonWidgetRuler').style.background = '#81D4FA';
         Polymer.dom(this.root).querySelector('#amiwidget').guiobjects = { type: 'Ruler' };
         Polymer.dom(this.root).querySelector('#amiwidget2').guiobjects = { type: 'Ruler' };
       }
 
-      ActivateWidgetVoxelProbe() {
-        this.restartbackgroundbuttons('widgetbutton');
+      activateWidgetVoxelProbe() {
+        this.restartBackgroundButtons('widgetbutton');
         Polymer.dom(this.root).querySelector('#ButtonWidgetVoxelProbe').style.background = '#81D4FA';
         Polymer.dom(this.root).querySelector('#amiwidget').guiobjects = { type: 'VoxelProbe' };
         Polymer.dom(this.root).querySelector('#amiwidget2').guiobjects = { type: 'VoxelProbe' };
       }
 
-      ActivateWidgetAnnotation() {
-        this.restartbackgroundbuttons('widgetbutton');
+      activateWidgetAnnotation() {
+        this.restartBackgroundButtons('widgetbutton');
         Polymer.dom(this.root).querySelector('#ButtonWidgetAnnotation').style.background = '#81D4FA';
         Polymer.dom(this.root).querySelector('#amiwidget').guiobjects = { type: 'Annotation' };
         Polymer.dom(this.root).querySelector('#amiwidget2').guiobjects = { type: 'Annotation' };
       }
 
-      ActivateWidgetRoi() {
-        this.restartbackgroundbuttons('widgetbutton');
+      activateWidgetRoi() {
+        this.restartBackgroundButtons('widgetbutton');
         Polymer.dom(this.root).querySelector('#ButtonWidgetRoi').style.background = '#81D4FA';
         Polymer.dom(this.root).querySelector('#amiwidget').guiobjects = { type: 'Roi' };
         Polymer.dom(this.root).querySelector('#amiwidget2').guiobjects = { type: 'Roi' };
       }
 
-      ActivateMove() {
-        this.restartbackgroundbuttons('widgetbutton');
+      activateMove() {
+        this.restartBackgroundButtons('widgetbutton');
         Polymer.dom(this.root).querySelector('#ButtonMove').style.background = '#81D4FA';
         Polymer.dom(this.root).querySelector('#amiwidget').guiobjects = { type: null };
         Polymer.dom(this.root).querySelector('#amiwidget2').guiobjects = { type: null };
       }
 
-      ClearWidgets1() {
-        this.restartbackgroundbuttons('widgetbutton');
+      clearWidgets1() {
+        this.restartBackgroundButtons('widgetbutton');
         Polymer.dom(this.root).querySelector('#amiviewer').ClearDOMWidgets();
         Polymer.dom(this.root).querySelector('#amiwidget').RemoveWidgets();
         Polymer.dom(this.root).querySelector('#amiwidget').guiobjects = { type: null };
         Polymer.dom(this.root).querySelector('#amiwidget2').guiobjects2 = { type: null };
       }
 
-      ClearWidgets2() {
-        this.restartbackgroundbuttons('widgetbutton');
+      clearWidgets2() {
+        this.restartBackgroundButtons('widgetbutton');
         Polymer.dom(this.root).querySelector('#amiviewer2').ClearDOMWidgets();
         Polymer.dom(this.root).querySelector('#amiwidget2').RemoveWidgets();
         Polymer.dom(this.root).querySelector('#amiwidget').guiobjects = { type: null };
         Polymer.dom(this.root).querySelector('#amiwidget2').guiobjects2 = { type: null };
       }
 
-      RoiToBidirectionalRuler() {
-        this.restartbackgroundbuttons('widgetbutton');
-        Polymer.dom(this.root).querySelector('#amiwidget').RoiToBidirectionalRuler();
-        Polymer.dom(this.root).querySelector('#amiwidget2').RoiToBidirectionalRuler();
+      roiToBidirectionalRuler() {
+        this.restartBackgroundButtons('widgetbutton');
+        Polymer.dom(this.root).querySelector('#amiwidget').roiToBidirectionalRuler();
+        Polymer.dom(this.root).querySelector('#amiwidget2').roiToBidirectionalRuler();
         widgetelement.guiobjects = { type: null };
         widgetelement2.guiobjects2 = { type: null };
       }
 
       checkInput(widgetsInfo) {
-        var numberOfRulers = 0;
-        for (var i in widgetsInfo) {
+        let numberOfRulers = 0;
+        for (let i in widgetsInfo) {
           if (widgetsInfo[i] !== null) {
-            var widget = widgetsInfo[i];
+            let widget = widgetsInfo[i];
             if (widget['constructor'] === 'WidgetsRuler') {
               numberOfRulers = numberOfRulers + 1;
             }
@@ -828,14 +823,14 @@
         return true; // input is ok
       }
 
-      Evaluate() {
-        this.restartbackgroundbuttons('widgetbutton');
-        var widgetsInfo1 = Polymer.dom(this.root).querySelector('#amiwidget').GetWidgets();
-        var widgetsInfo2 = Polymer.dom(this.root).querySelector('#amiwidget2').GetWidgets();
+      evaluate() {
+        this.restartBackgroundButtons('widgetbutton');
+        let widgetsInfo1 = Polymer.dom(this.root).querySelector('#amiwidget').GetWidgets();
+        let widgetsInfo2 = Polymer.dom(this.root).querySelector('#amiwidget2').GetWidgets();
         this.displayTable(widgetsInfo1, widgetsInfo2);
       }
 
-      orderDistances(ArrayDistances) {
+      orderDistances(arrayDistances) {
         Array.prototype.max = function () {
           return Math.max.apply(null, this);
         };
@@ -844,47 +839,47 @@
           return Math.min.apply(null, this);
         };
 
-        var minDistance = null;
-        var maxDistance = null;
+        let minDistance = null;
+        let maxDistance = null;
 
-        minDistance = ArrayDistances.min();
-        maxDistance = ArrayDistances.max();
+        minDistance = arrayDistances.min();
+        maxDistance = arrayDistances.max();
 
-        var orderedDistances = [minDistance, maxDistance];
+        let orderedDistances = [minDistance, maxDistance];
 
         return orderedDistances;
       }
 
       extractDistances(allWidgetsInfo) {
-        var distances = [];
+        let distances = [];
 
         for (let index in allWidgetsInfo) {
 
-          var widgetsInfo = allWidgetsInfo[index];
+          let widgetsInfo = allWidgetsInfo[index];
 
-          for (var i = 1; i < widgetsInfo.length; i++) {
+          for (let i = 1; i < widgetsInfo.length; i++) {
             if (widgetsInfo[i] !== null) {
-              var widget = widgetsInfo[i];
+              let widget = widgetsInfo[i];
               if (widget['constructor'] === 'WidgetsRuler') {
-                var distancearray = []
-                var distance = widget['distance'];
+                let distanceArray = []
+                let distance = widget['distance'];
                 //console.log('distance ' + distance);
                 distance = distance.split(' ');
                 distance = parseFloat(distance[0]);
-                distancearray.push(distance);
+                distanceArray.push(distance);
 
                 i = i + 1;
                 if (widgetsInfo[i] !== undefined) {
-                  var widget2 = widgetsInfo[i];
+                  let widget2 = widgetsInfo[i];
                   if (widget2['constructor'] === 'WidgetsRuler') {
-                    var distance = widget2['distance'];
+                    let distance = widget2['distance'];
                     distance = distance.split(' ');
                     distance = parseFloat(distance[0]);
-                    distancearray.push(distance);
+                    distanceArray.push(distance);
                   } else {
                     return false;
                   }
-                  distances.push(this.orderDistances(distancearray));
+                  distances.push(this.orderDistances(distanceArray));
                 } else {
                   return false;
                 }
@@ -896,11 +891,9 @@
         return distances;
       }
 
-
       insertCell(distance) {
         return '<th>' + distance + '</th>';
       }
-
 
       insertNodal(distance) {
         if (distance[0] >= 15)
@@ -953,40 +946,34 @@
           this.insertNodal(distance) +
           '</tr>'
         )
-
         return
       }
 
       createTumorRows(tableId, distances) {
         $(Polymer.dom(this.root).querySelector('#' + tableId)).find('tr:gt(0)').remove();//remove all rows
-        for (var i = 0; i < distances.length; i++) {
+        for (let i = 0; i < distances.length; i++) {
           if (Array.isArray(distances[i]))
             this.createTumorRow(tableId, distances[i]);
         }
         return
       }
 
-
       displayTable(widgetsinfo1, widgetsinfo2) {
-        var distancesViewer1 = this.extractDistances(widgetsinfo1);
-        var distancesViewer2 = this.extractDistances(widgetsinfo2);
-
+        let distancesViewer1 = this.extractDistances(widgetsinfo1);
+        let distancesViewer2 = this.extractDistances(widgetsinfo2);
         if (distancesViewer1 !== false)
           this.createTumorRows('tableTumour', distancesViewer1);
-
         if (distancesViewer2 !== false)
           this.createTumorRows('tableTumour2', distancesViewer2);
-
       }
 
-
       getTableColumnText(tableId, column) {
-        var array = [];
-        var end = false;
-        var i = 1;
+        let array = [];
+        let end = false;
+        let i = 1;
         while (end === false) {
           try {
-            var value = Polymer.dom(this.root).querySelector('#' + tableId).rows[i].cells[column].innerHTML;
+            let value = Polymer.dom(this.root).querySelector('#' + tableId).rows[i].cells[column].innerHTML;
             array.push(value);
             i = i + 1;
           } catch (e) {
@@ -997,13 +984,13 @@
       }
 
       getTableColumnValue(selector) {
-        var array = [];
-        var end = false;
-        var i = 0;
+        let array = [];
+        let end = false;
+        let i = 0;
         while (end === false) {
           try {
-            var element = Polymer.dom(this.root).querySelectorAll(selector)[i];
-            var selection = element.options[element.selectedIndex].value;
+            let element = Polymer.dom(this.root).querySelectorAll(selector)[i];
+            let selection = element.options[element.selectedIndex].value;
             array.push(selection);
             i = i + 1;
           } catch (e) {
@@ -1014,9 +1001,9 @@
       }
 
       getSumOfArray(array, nodal) {
-        var sum = 0;
-        for (var i = 0; i < array.length; i++) {
-          var element = array[i];
+        let sum = 0;
+        for (let i = 0; i < array.length; i++) {
+          let element = array[i];
           if (nodal[i] === 'Nodal')
             sum = sum + element[0];
           if (nodal[i] === 'Non-Nodal')
@@ -1051,7 +1038,7 @@
       }
 
       insertGrowth(growth) {
-        var difference;
+        let difference;
         if (growth > 1)
           difference = (growth * 100) - 100;
         if (growth < 1)
@@ -1071,50 +1058,44 @@
       }
 
       checkNewLesions(nodal1, nodal2) {
-        var TargetLesions1 = nodal1.filter(i => i === 'Nodal') + nodal1.filter(i => i === 'Non-Nodal')
-        var TargetLesions2 = nodal2.filter(i => i === 'Nodal') + nodal2.filter(i => i === 'Non-Nodal')
-        if (TargetLesions2 > TargetLesions1) {
+        let targetLesions1 = nodal1.filter(i => i === 'Nodal') + nodal1.filter(i => i === 'Non-Nodal')
+        let targetLesions2 = nodal2.filter(i => i === 'Nodal') + nodal2.filter(i => i === 'Non-Nodal')
+        if (targetLesions2 > targetLesions1) {
           return true;
         }
         return false;
       }
 
-
       evaluateGrowth() {
-        var widgetsinfo1 = Polymer.dom(this.root).querySelector('#amiwidget').GetWidgets();
-        var widgetsinfo2 = Polymer.dom(this.root).querySelector('#amiwidget2').GetWidgets();
-        var distancesViewer1 = this.extractDistances(widgetsinfo1);
-        var distancesViewer2 = this.extractDistances(widgetsinfo2);
+        let widgetsinfo1 = Polymer.dom(this.root).querySelector('#amiwidget').GetWidgets();
+        let widgetsinfo2 = Polymer.dom(this.root).querySelector('#amiwidget2').GetWidgets();
+        let distancesViewer1 = this.extractDistances(widgetsinfo1);
+        let distancesViewer2 = this.extractDistances(widgetsinfo2);
 
-        var nodal1 = this.getTableColumnText('tableTumour', 3);
+        let nodal1 = this.getTableColumnText('tableTumour', 3);
+        let nodal2 = this.getTableColumnText('tableTumour2', 3);
 
-        var nodal2 = this.getTableColumnText('tableTumour2', 3);
-
-        var sum1 = this.getSumOfArray(distancesViewer1, nodal1);
-        var sum2 = this.getSumOfArray(distancesViewer2, nodal2);
+        let sum1 = this.getSumOfArray(distancesViewer1, nodal1);
+        let sum2 = this.getSumOfArray(distancesViewer2, nodal2);
 
         const growth = sum2 / sum1;
-        var state;
+        let state;
+
         if (growth > 1.2) {
           state = 3;
         }
-
         if (growth < 1.2 && growth > 0.7) {
           state = 2;
         }
-
         if (growth < 0.7) {
           state = 1;
         }
-
         if (growth === 0) {
           state = 0;
         }
-
         if (this.checkNewLesions(nodal1, nodal2)) { // if new lesions, PD
           state = 3;
         }
-
         this.insertResults(state, growth);
       }
     }
