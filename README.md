@@ -4,7 +4,7 @@ Recist-App is a cloud application for the interactive analysis of the evolution 
 
 - Import DICOM medical images from URL or local storage
 - Mark the size of the lesions
-- Get the RECIST evaluation following RECIST standards
+- Get the final evaluation following RECIST standards
 
 ### Tech
 
@@ -31,6 +31,8 @@ $ npm start
 [Check it live!](https://recist-app.herokuapp.com/)
 
 ![alt text](https://raw.githubusercontent.com/adefrutoscasado/recist-app/6cfcff3a0767f49a52a00337703574bd73223391/demo.gif)
+
+_Note: Example is not using a real case/data_
 
 ## License
 
